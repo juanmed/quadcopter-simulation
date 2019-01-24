@@ -6,8 +6,10 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 """
 
 from quadPlot import plot_quad_3d
+
 from control import lqr_controller as lqr
 from control import pid_controller as pid
+from control import df_controller as df
 
 import trajGen
 import trajGen3D
@@ -22,7 +24,7 @@ time = [0.0]
 
 def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints, coeff_x, coeff_y, coeff_z)
-    F, M = lqr.run(quad, desired_state)
+    F, M = df.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
 
