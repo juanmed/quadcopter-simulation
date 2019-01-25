@@ -19,9 +19,27 @@ def get_helix_waypoints(t, n):
         output waypoints shape is [n, 3]
     """
     waypoints_t = np.linspace(0, t, n)
-    x = 0.5*np.cos(waypoints_t)
-    y = 0.5*np.sin(waypoints_t)
-    z = waypoints_t
+
+    a = .5
+    b = .5
+    c = 1.0
+
+    wx = 1.0
+    wy = 1.0
+
+    x_0 = 0.0
+    y_0 = 0.0
+    z_0 = 0.0
+
+    # positions in helix
+    x = a*np.cos(wx*waypoints_t) + x_0
+    y = b*np.sin(wy*waypoints_t) + y_0
+    z = c*waypoints_t
+
+
+    #x = 0.5*np.cos(waypoints_t)
+    #y = 0.5*np.sin(waypoints_t)
+    #z = waypoints_t
 
     return np.stack((x, y, z), axis=-1)
     
@@ -34,14 +52,14 @@ def get_poly_waypoints(t,n):
         Output waypoints shape is [n, 3]
     """
     waypoints_t = np.linspace(0, t, n)
-    k1 = 0.0
-    k2 = 0.0
-    #x = (k1*waypoints_t)**2
-    #y = (k1*waypoints_t)**3
-    #z = k2*waypoints_t
-    x = k1*np.ones_like(waypoints_t)
-    y = k2*np.ones_like(waypoints_t)
-    z = waypoints_t
+    k1 = 0.1
+    k2 = 0.1
+    x = (k1*waypoints_t)#**2
+    y = (k1*waypoints_t)#**3
+    z = k2*waypoints_t
+    #x = k1*np.ones_like(waypoints_t)
+    #y = k2*np.ones_like(waypoints_t)
+    #z = waypoints_t
 
 
     return np.stack((x, y, z), axis=-1)
@@ -93,6 +111,7 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
     jerk = np.zeros(3)
     snap = np.zeros(3)
     yawddot = 0.0
+    print(t)
 
     # distance vector array, represents each segment's distance
     distance = waypoints[0:-1] - waypoints[1:]
@@ -116,7 +135,7 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
             #  if velocity vector is of zero magnitude there should be no change in heading!
             pass
         else:
-            current_heading = v_proj/LA.norm(v_proj) * (1.0 / T[0])
+            current_heading = v_proj/LA.norm(v_proj)# * (1.0 / T[0])
             
 
     # stay hover at the last waypoint position
@@ -133,19 +152,19 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
 
         t1 = get_poly_cc(8, 1, scale)
         # chain rule applied
-        vel = np.array([coeff_x[start:end].dot(t1), coeff_y[start:end].dot(t1), coeff_z[start:end].dot(t1)]) * (1.0 / T[t_index])
+        vel = np.array([coeff_x[start:end].dot(t1), coeff_y[start:end].dot(t1), coeff_z[start:end].dot(t1)]) #* (1.0 / T[t_index])
 
         t2 = get_poly_cc(8, 2, scale)
         # chain rule applied
-        acc = np.array([coeff_x[start:end].dot(t2), coeff_y[start:end].dot(t2), coeff_z[start:end].dot(t2)]) * (1.0 / T[t_index]**2)
+        acc = np.array([coeff_x[start:end].dot(t2), coeff_y[start:end].dot(t2), coeff_z[start:end].dot(t2)]) #* (1.0 / T[t_index]**2)
 
         t3 = get_poly_cc(8, 3, scale)
         # apply chain rule
-        jerk = np.array([coeff_x[start:end].dot(t3), coeff_y[start:end].dot(t3), coeff_z[start:end].dot(t3)]) * (1.0 / T[t_index]**3)
+        jerk = np.array([coeff_x[start:end].dot(t3), coeff_y[start:end].dot(t3), coeff_z[start:end].dot(t3)])# * (1.0 / T[t_index]**3)
 
         t4 = get_poly_cc(8, 4, scale)
         # apply chain rule
-        snap = np.array([coeff_x[start:end].dot(t4), coeff_y[start:end].dot(t4), coeff_z[start:end].dot(t4)]) * (1.0 / T[t_index]**4)
+        snap = np.array([coeff_x[start:end].dot(t4), coeff_y[start:end].dot(t4), coeff_z[start:end].dot(t4)])# * (1.0 / T[t_index]**4)
 
         # calculate desired yaw and yaw rate
 
@@ -194,6 +213,67 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
         
         yaw = 0
         yawdot = 0
+    return DesiredState(pos, vel, acc, jerk, snap, yaw, yawdot, yawddot)
+
+def generate_helix_trajectory(t, t_max):
+
+    """
+        This function returns the trajectory: position, velocity,
+        acceleration, jerk and snap an object going through a 3D helix 
+        should have.
+    """
+    a = .5
+    b = .5
+    c = 1.0
+
+    wx = 1.0
+    wy = 1.0
+
+    x_0 = 0.0
+    y_0 = 0.0
+    z_0 = 0.0
+
+    # positions in helix
+    x = a*np.cos(wx*t) + x_0
+    y = b*np.sin(wy*t) + y_0
+    z = c*t
+    #psi = 0.0*np.ones_like(t)
+    #tangent_vector = map(lambda a,b,c: np.matrix([[a],[b],[0]]),-a*wx*np.sin(wx*t),b*wy*np.cos(wy*t),c)
+    yaw = np.sin(t)
+    #psi = np.arccos( )
+
+    # velocities in helix
+    v_x = -a*wx*np.sin(wx*t)
+    v_y = b*wy*np.cos(wy*t)
+    v_z = c*np.ones_like(t)
+    yawdot = np.cos(t)#0.0*np.ones_like(t)
+
+    # accelerations in helix
+    a_x = -(wx**2)*(x - x_0)
+    a_y = -(wy**2)*(y - y_0)
+    a_z = 0.0*np.ones_like(t)
+    yawddot = -1.0*np.sin(t)#0.0*np.ones_like(t)
+
+    # jerks in helix
+    j_x = -(wx**2)*(v_x)
+    j_y = -(wy**2)*(v_y)
+    j_z = 0.0*np.ones_like(t)
+    yaw_ddd = -1.0*np.cos(t)#0.0*np.ones_like(t)
+
+    # snap in helix
+    s_x = -(wx**2)*(a_x)
+    s_y = -(wy**2)*(a_y)
+    s_z = 0.0*np.ones_like(t)
+    yaw_dddd = np.sin(t) #0.0*np.ones_like(t)
+
+    # pack everything
+    pos = np.array([[x,y,z]])
+    vel = np.array([[v_x,v_y,v_z]])
+    acc = np.array([[a_x,a_y,a_z]])
+    jerk = np.array([[j_x,j_y,j_z]])
+    snap = np.array([[s_x,s_y,s_z]])
+
+
     return DesiredState(pos, vel, acc, jerk, snap, yaw, yawdot, yawddot)
 
 def get_poly_cc(n, k, t):
