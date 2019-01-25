@@ -12,7 +12,7 @@ def RotToRPY(R):
     phi = asin(R[1,2])
     theta = atan2(-R[0,2]/cos(phi),R[2,2]/cos(phi))
     psi = atan2(-R[1,0]/cos(phi),R[1,1]/cos(phi))
-    return phi, theta, psi
+    return np.array([phi, theta, psi])
 
 def RPYToRot(phi, theta, psi):
     """

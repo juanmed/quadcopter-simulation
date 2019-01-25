@@ -183,7 +183,6 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
         
         yaw = 0
         yawdot = 0
-        print (" yaw: {}  yawdot: {}".format(yaw,yawdot))
     return DesiredState(pos, vel, acc, yaw, yawdot)
 
 def get_poly_cc(n, k, t):
