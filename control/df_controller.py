@@ -10,8 +10,20 @@ import numpy as np
 import model.params as params
 from math import sin, cos
 
-#import utils.dif_flat as df
+import dif_flat as dfl
 from utils.utils import RPYToRot, RPYToRot2
+
+# LQR Translational gains and reference input matrices
+Kt = np.matrix([3.162277, 2.70639])
+Nu_t = np.matrix([0.0])
+Nx_t = np.matrix([[1.0],[0.0]])
+
+
+
+# LQR Rotational gains
+Kr = 3.162277
+Nu_r = 0.0
+Nx_r = 1.0
 
 def run(quad, des_state):
 
@@ -30,7 +42,7 @@ def run(quad, des_state):
     trajectory = [pos_traj, vel_traj, acc_traj, jerk_traj, snap_traj, yaw_traj, yaw_dot_traj, yaw_ddot_traj]
 
     # compute reference states and inputs from desired trajectory
-    ref_ = df.compute_ref(trajectory)
+    ref_ = dfl.compute_ref(trajectory)
     #print(ref_)
     # extract each reference state and inputs
     x_r,y_r,z_r = ref_[0]
@@ -45,11 +57,7 @@ def run(quad, des_state):
     phi, theta, psi = quad.attitude()
     p, q, r = quad.omega()
 
-    # LQR Translational gains
-    Kt = np.matrix([3.162277, 2.70639])
 
-    # LQR Rotational gains
-    Kr = 3.162277
 
     # compute state error
     # state error = reference_state - drone_state
@@ -70,6 +78,7 @@ def run(quad, des_state):
     q_e = q_r.item(0) - q   
     r_e = r_r.item(0) - r
 
+    """
     # compute error input
     ua_e_x = -1.0*Kt*np.matrix([[x_e],[vx_e]])
     ua_e_y = -1.0*Kt*np.matrix([[y_e],[vy_e]])
@@ -85,7 +94,35 @@ def run(quad, des_state):
     uc_e_y = -1.0*Kr*theta_e
     uc_e_z = -1.0*Kr*psi_e
     uc_e = np.matrix([[uc_e_x],[uc_e_y],[uc_e_z]])
+    """
+    # In general    u = -K*x + (N_u + K*N_x)*r
+    # r = reference state
+    # x = state
+    # K = LQR gains
+    # N_u, N_x = refrence input and reference state matrices
 
+    
+    x_state = np.matrix([[x],[x_dot]])
+    ua_e_x = -Kt*x_state + (Nu_t + Kt*Nx_t)*x_r
+
+    y_state = np.matrix([[y],[y_dot]])
+    ua_e_y = -Kt*y_state + (Nu_t + Kt*Nx_t)*y_r
+
+    z_state = np.matrix([[z],[z_dot]])
+    ua_e_z = -Kt*z_state + (Nu_t + Kt*Nx_t)*z_r
+    ua_e = np.matrix([[ua_e_x.item(0)],[ua_e_y.item(0)],[ua_e_z.item(0)]])
+
+    #wx_state = np.matrix([[z],[z_dot]])
+    ub_e_x = -Kr*p + (Nu_r + Kr*Nx_r)*p_r.item(0)
+    ub_e_y = -Kr*q + (Nu_r + Kr*Nx_r)*q_r.item(0)   
+    ub_e_z = -Kr*r + (Nu_r + Kr*Nx_r)*r_r.item(0) 
+    ub_e = np.matrix([[ub_e_x],[ub_e_y],[ub_e_z]])
+
+    uc_e_x = -1.0*Kr*phi_e
+    uc_e_y = -1.0*Kr*theta_e
+    uc_e_z = -1.0*Kr*psi_e
+    uc_e = np.matrix([[uc_e_x],[uc_e_y],[uc_e_z]])    
+    
 
     # compute inputs to system
     # u_s = u_e + u_r
@@ -96,7 +133,7 @@ def run(quad, des_state):
     # Now apply the inverse function to obtain F and M  
 
     # First obtain F = Rbw*Z_b(m*ua_s +g*Z_w)
-    R = np.matrix(RPYToRot2(phi, theta, psi)) # this rotation is world to body frame
+    R = np.matrix(RPYToRot(phi, theta, psi)) # this rotation is world to body frame
     #R = np.matrix(RPYToRot2(phi_r.item(0), theta_r.item(0), psi_r.item(0))) # this rotation is world to body frame
 
     #R = R.T  # I need body to world frame
@@ -119,8 +156,8 @@ def run(quad, des_state):
     #M = ref_[8]
     #M = np.array([[M.item(0)],[M.item(1)],[M.item(2)]])
 
-    print(F.item(0))
-    print(M)
+    #print(F.item(0))
+    #print(M)
     #F = 1.0
     #M = np.array([[0.0],[0.0],[0.0]])
     return F.item(0), M

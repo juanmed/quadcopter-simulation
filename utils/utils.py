@@ -17,6 +17,9 @@ def RotToRPY(R):
 def RPYToRot(phi, theta, psi):
     """
     phi, theta, psi = roll, pitch , yaw
+    The euler angle convention used is ZXY. This means: first a rotation of psi-degrees
+    around Z axis, then rotation of phi-degress around X axis, and finally rotation of
+    theta-degrees around Y axis
     """
     return np.array([[cos(psi)*cos(theta) - sin(phi)*sin(psi)*sin(theta), cos(theta)*sin(psi) + cos(psi)*sin(phi)*sin(theta), -cos(phi)*sin(theta)],
                      [-cos(phi)*sin(psi), cos(phi)*cos(psi), sin(phi)],

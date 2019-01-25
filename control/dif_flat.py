@@ -8,20 +8,35 @@ import numpy as np
 
 #from math import sin, cos, asin, atan2, sqrt
 
-def RotToRPY(R):
+def RotToRPY_ZYX(R):
 	"""
 		Euler angle convention is ZYX, which means first apply
 		rotaion of psi-degrees around Z axis, then rotation of
 		theta-degrees around new Y axis, and then rotation of 
 		phi-degrees around new X axis.
 
-		The rotation R received should be from body to world frame.
+		** The rotation R received should be from body to world frame. **
 	"""
 	theta = np.arcsin(-1.0*R.item(2,0))
 	phi = np.arctan2(R.item(2,1)/np.cos(theta),R.item(2,2)/np.cos(theta))
 	psi = np.arctan2(R.item(1,0)/np.cos(theta),R.item(0,0)/np.cos(theta))
 
 	return np.matrix([ [phi], [theta], [psi] ]) 
+
+def RotToRPY_ZXY(R):
+    """
+    phi, theta, psi = roll, pitch , yaw
+    The euler angle convention used is ZXY. This means: first a rotation of psi-degrees
+    around Z axis, then rotation of phi-degress around X axis, and finally rotation of
+    theta-degrees around Y axis
+
+    	** The rotation R received should be from world to body frame **
+    """
+    phi = np.arcsin(R[1,2])
+    theta = np.arctan2(-R[0,2]/np.cos(phi),R[2,2]/np.cos(phi))
+    psi = np.arctan2(-R[1,0]/np.cos(phi),R[1,1]/np.cos(phi))
+    return np.matrix([ [phi], [theta], [psi] ])
+
 
 def get_x(sigma1):
 	return sigma1
@@ -71,12 +86,12 @@ def get_yb(z_b,x_b):
 	return a/np.linalg.norm(a)
 
 def get_wx(y_b,j,u_1):
-	wx = -1.0*m*((y_b.T)*j)/u_1
-	return wx
+	w_x = -1.0*m*((y_b.T)*j)/u_1
+	return w_x
 
 def get_wy(x_b,j,u_1):
-	wy = m*((x_b.T)*j)/u_1
-	return wy
+	w_y = m*((x_b.T)*j)/u_1
+	return w_y
 
 def get_wz(psi_rate,x_c,x_b,w_y,y_c,z_b):
 	"""
@@ -85,8 +100,8 @@ def get_wz(psi_rate,x_c,x_b,w_y,y_c,z_b):
 	a = psi_rate*(x_c.T)*x_b
 	b = w_y*(y_c.T)*z_b
 	c = np.linalg.norm(np.cross(y_c,z_b,axis = 0))
-	wz = (a+b)/c
-	return wz
+	w_z = (a+b)/c
+	return w_z
 
 def get_wy_dot(x_b,s,u_1_dot,w_y,u_1,w_x,w_z):
 	"""
@@ -104,9 +119,9 @@ def get_wx_dot(y_b,s,u_1_dot,w_x,u_1,w_y,w_z):
 	"""
 		Will use wx_dot = (a + b + c)/d
 	"""
-	a = (y_b.T)*s
-	b = 2.0*u_1_dot*w_x/m
-	c = -1.0*u_1*w_y*w_z/m
+	a = -1.0*(y_b.T)*s
+	b = -2.0*u_1_dot*w_x/m
+	c = u_1*w_y*w_z/m
 	d = u_1/m
 	w_x_dot = (a+b+c)/d
 	return w_x_dot
@@ -221,10 +236,17 @@ def compute_ref(trajectory):
 	# This matrix represents the orientation of the quadrotor
 	R_ = np.concatenate((x_b, y_b, z_b), axis = 1)
 
-	# Get rall pitch yaw angles assuming ZYX Euler angle convention
+	# Get roll pitch yaw angles assuming ZXY Euler angle convention
 	# This means: first rotate psi degrees around Z axis,
 	# then theta degrees around Y axis, and lastly phi degrees around X axis
-	or_ = RotToRPY(R_)
+	
+	#or_ = RotToRPY_ZYX(R_)  # assuming ZYX Eugler angle convention, so sent matrix should be 
+							  # body - world frame
+
+	or_ = RotToRPY_ZXY(R_.T)  # assuming ZXY Eugler angle convention, so sent matrix should be 
+							  # world - body frame
+
+
 
 	# compute u_a input for system reference
 	# can be computed as follows or simply the received acc_traj
@@ -246,7 +268,7 @@ def compute_ref(trajectory):
 
 	# we send the received pos_traj, and vel_traj vectors as the reference pos and vel vectors
 	# because that is the result from the differential flatness output selection
-	return [pos_traj.T, vel_traj.T, or_, w_, u_a, u_b, u_c, u_1, u_x]
+	return [pos_traj.T, vel_traj.T, or_, w_, acc_traj.T, w_dot_, u_c, u_1, u_x]
 
 
 

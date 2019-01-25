@@ -10,7 +10,7 @@ from numpy.linalg import inv
 from collections import namedtuple
 from numpy import linalg as LA
 
-DesiredState = namedtuple('DesiredState', 'pos vel acc yaw yawdot')
+DesiredState = namedtuple('DesiredState', 'pos vel acc jerk snap yaw yawdot yawddot')
 yaw = 0.0
 current_heading = np.array([1.0,0.0]) #heading vector should always be unitary vector. [0,0] vector has no heading!
 
@@ -33,7 +33,7 @@ def get_poly_waypoints(t,n):
             z = k2*t
         Output waypoints shape is [n, 3]
     """
-    waypoints_t = np.linspace(0, t + 4*np.pi, n)
+    waypoints_t = np.linspace(0, t, n)
     k1 = 0.0
     k2 = 0.0
     #x = (k1*waypoints_t)**2
@@ -90,6 +90,9 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
     pos = np.zeros(3)
     acc = np.zeros(3)
     vel = np.zeros(3)
+    jerk = np.zeros(3)
+    snap = np.zeros(3)
+    yawddot = 0.0
 
     # distance vector array, represents each segment's distance
     distance = waypoints[0:-1] - waypoints[1:]
@@ -113,7 +116,7 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
             #  if velocity vector is of zero magnitude there should be no change in heading!
             pass
         else:
-            current_heading = v_proj/LA.norm(v_proj)
+            current_heading = v_proj/LA.norm(v_proj) * (1.0 / T[0])
             
 
     # stay hover at the last waypoint position
@@ -135,6 +138,14 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
         t2 = get_poly_cc(8, 2, scale)
         # chain rule applied
         acc = np.array([coeff_x[start:end].dot(t2), coeff_y[start:end].dot(t2), coeff_z[start:end].dot(t2)]) * (1.0 / T[t_index]**2)
+
+        t3 = get_poly_cc(8, 3, scale)
+        # apply chain rule
+        jerk = np.array([coeff_x[start:end].dot(t3), coeff_y[start:end].dot(t3), coeff_z[start:end].dot(t3)]) * (1.0 / T[t_index]**3)
+
+        t4 = get_poly_cc(8, 4, scale)
+        # apply chain rule
+        snap = np.array([coeff_x[start:end].dot(t4), coeff_y[start:end].dot(t4), coeff_z[start:end].dot(t4)]) * (1.0 / T[t_index]**4)
 
         # calculate desired yaw and yaw rate
 
@@ -179,12 +190,11 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
         yawdot = delta_psi / 0.005 # dt is control period
         max_yawdot = 5.0 #rad/s
         if(abs(yawdot) > max_yawdot):
-            yawdot = (yawdot/abs(yawdot))*5.0 # make it 5rad/s with appropriate direction
+            yawdot = (yawdot/abs(yawdot))*max_yawdot # make it 5rad/s with appropriate direction
         
         yaw = 0
         yawdot = 0
-        print (" yaw: {}  yawdot: {}".format(yaw,yawdot))
-    return DesiredState(pos, vel, acc, yaw, yawdot)
+    return DesiredState(pos, vel, acc, jerk, snap, yaw, yawdot, yawddot)
 
 def get_poly_cc(n, k, t):
     """ This is a helper function to get the coeffitient of coefficient for n-th
