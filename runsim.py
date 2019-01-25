@@ -12,6 +12,7 @@ from control import pid_controller as pid
 
 import trajGen
 import trajGen3D
+import utils.utils as utils
 import model.params as params
 from model.quadcopter import Quadcopter
 import numpy as np
@@ -52,12 +53,8 @@ def record(name):
     fig1ax4 = fig1.add_subplot(3,2,5)
     fig1ax5 = fig1.add_subplot(3,2,6)
 
-    # Thrust
-    fig0ax0.plot(t_s, F_t, linestyle = "-", color = "r", label = "F")
-    fig0ax0.plot(t_s, params.mass*params.g*np.ones_like(t_s), linestyle="--", color = "k", label = "m*g")
-    fig0ax0.set_title("Rotor Thrust -F- over time")
-    fig0ax0.set_xlabel('t {s}')
-    fig0ax0.set_ylabel('F {N}')
+    weight = params.mass*params.g*np.ones_like(t_s)
+    fig0ax0 = utils.add_plots(fig0ax0,t_s,[F_t,weight],["-","--"],["r","k"],["F","m*g"],"Rotor Thrust -F- over time",'t {s}','F {N}')
     fig0ax0.legend(loc='lower right', shadow=True, fontsize='small') 
 
     # Torques
@@ -65,12 +62,7 @@ def record(name):
     u3 = map(lambda a: a[1],M_t)
     u4 = map(lambda a: a[2],M_t)
 
-    fig0ax1.plot(t_s, u2,  linestyle = "-", color = "r", label = "u2")
-    fig0ax1.plot(t_s, u3,  linestyle = "-", color = "g", label = "u3")
-    fig0ax1.plot(t_s, u4,  linestyle = "-", color = "b", label = "u4")
-    fig0ax1.set_title("Components of torque vector M over time")
-    fig0ax1.set_xlabel('t {s}')
-    fig0ax1.set_ylabel('u2,u3,u4 {N*m}')
+    fig0ax1 = utils.add_plots(fig0ax1,t_s,[u2,u3,u4],["-","-","-"],["r","g","b"],["u2","u3","u4"],"Components of torque vector M over time","t {s}","{N*m}")
     fig0ax1.legend(loc='lower right', shadow=True, fontsize='small')
 
     # X position
@@ -78,12 +70,7 @@ def record(name):
     d_x = map(lambda a: a.pos[0], d_s)  # get desired x position
     x_e = map(lambda a,b: a-b,d_x,q_x)  # compute error
 
-    fig0ax2.plot(t_s, q_x, linestyle = "-", color = "g", label = "quad x")
-    fig0ax2.plot(t_s, d_x, linestyle = "--", color = "r", label = "des x")
-    fig0ax2.plot(t_s, x_e, linestyle = "-", color = "b", label = "x error")
-    fig0ax2.set_title("X - axis position of quadrotor")
-    fig0ax2.set_xlabel('t {s}')
-    fig0ax2.set_ylabel('x {m}')
+    fig0ax2 = utils.add_plots(fig0ax2,t_s,[q_x,d_x,x_e],["-","--","-"],["g","r","b"],["quad x","des x","x error"],"X - axis position of quadrotor","t {s}","x {m}")
     fig0ax2.legend(loc='lower right', shadow=True, fontsize='small')
 
     # Y position
@@ -91,12 +78,7 @@ def record(name):
     d_y = map(lambda a: a.pos[1], d_s)
     y_e = map(lambda a,b: a-b,d_y,q_y)
 
-    fig0ax3.plot(t_s, q_y, linestyle = "-", color = "g", label = "quad y")
-    fig0ax3.plot(t_s, d_y, linestyle = "--", color = "r", label = "des y")
-    fig0ax3.plot(t_s, y_e, linestyle = "-", color = "b", label = "y error")
-    fig0ax3.set_title("Y - axis position of quadrotor")
-    fig0ax3.set_xlabel('t {s}')
-    fig0ax3.set_ylabel('y {m}')
+    fig0ax3 = utils.add_plots(fig0ax3,t_s,[q_y,d_y,y_e],["-","--","-"],["g","r","b"],["quad y","des y","y error"],"Y - axis position of quadrotor","t {s}","y {m}")
     fig0ax3.legend(loc='lower right', shadow=True, fontsize='small')
 
     # Z position
@@ -104,12 +86,7 @@ def record(name):
     d_z = map(lambda a: a.pos[2], d_s)
     z_e = map(lambda a,b: a-b,d_z,q_z)
 
-    fig0ax4.plot(t_s, q_z, linestyle = "-", color = "g", label = "quad z")
-    fig0ax4.plot(t_s, d_z, linestyle = "--", color = "r", label = "des z")
-    fig0ax4.plot(t_s, z_e, linestyle = "-", color = "b", label = "z error")
-    fig0ax4.set_title("Z - axis position of quadrotor")
-    fig0ax4.set_xlabel('t {s}')
-    fig0ax4.set_ylabel('y {m}')
+    fig0ax4 = utils.add_plots(fig0ax4,t_s,[q_z,d_z,z_e],["-","--","-"],["g","r","b"],["quad z","des z","z error"],"Z - axis position of quadrotor","t {s}","z {m}")
     fig0ax4.legend(loc='lower right', shadow=True, fontsize='small')
 
     # Euler angles
@@ -117,12 +94,7 @@ def record(name):
     q_theta = map(lambda a: a[2][1]*180.0/np.pi, q_s)
     q_psi = map(lambda a: a[2][2]*180.0/np.pi, q_s)
 
-    fig0ax5.plot(t_s, q_phi, linestyle = "-", color = "r", label = "phi")
-    fig0ax5.plot(t_s, q_theta, linestyle = "-", color = "g", label = "theta")
-    fig0ax5.plot(t_s, q_psi, linestyle = "-", color = "b", label = "psi")
-    fig0ax5.set_title("Angular position of quadrotor")
-    fig0ax5.set_xlabel('t {s}')
-    fig0ax5.set_ylabel('phi, theta, psi {degree}')
+    fig0ax5 = utils.add_plots(fig0ax5,t_s,[q_phi,q_theta,q_psi],["-","--","-"],["r","g","b"],["phi","theta","psi"],"Angular position of quadrotor",'t {s}','phi, theta, psi {degree}')
     fig0ax5.legend(loc='lower right', shadow=True, fontsize='small')
 
     #  X Linear velocity
@@ -130,12 +102,7 @@ def record(name):
     d_vx = map(lambda a: a.vel[0], d_s)   
     vx_e = map(lambda a,b: a-b,d_vx,q_vx)
 
-    fig1ax0.plot(t_s, q_vx, linestyle = "-", color = "g", label = "quad Vx")
-    fig1ax0.plot(t_s, d_vx, linestyle = "--", color = "r", label = "des Vx")
-    fig1ax0.plot(t_s, vx_e, linestyle = "-", color = "b", label = "Vx error")
-    fig1ax0.set_title("X axis linear Velocities of quadrotor")
-    fig1ax0.set_xlabel('t {s}')
-    fig1ax0.set_ylabel('Vx {m/s}')
+    fig1ax0 = utils.add_plots(fig1ax0,t_s,[q_vx,q_vx,vx_e],["-","--","-"],["g","r","b"],["quad Vx","des Vx","Vx error"],"X axis linear Velocities of quadrotor",'t {s}','Vx {m/s}')
     fig1ax0.legend(loc='lower right', shadow=True, fontsize='small')   
 
     #  Y Linear velocity
@@ -143,12 +110,7 @@ def record(name):
     d_vy = map(lambda a: a.vel[1], d_s)   
     vy_e = map(lambda a,b: a-b,d_vy,q_vy)
 
-    fig1ax1.plot(t_s, q_vy, linestyle = "-", color = "g", label = "quad Vy")
-    fig1ax1.plot(t_s, d_vy, linestyle = "--", color = "r", label = "des Vy")
-    fig1ax1.plot(t_s, vy_e, linestyle = "-", color = "b", label = "Vy error")
-    fig1ax1.set_title("Y axis linear Velocities of quadrotor")
-    fig1ax1.set_xlabel('t {s}')
-    fig1ax1.set_ylabel('Vy {m/s}')
+    fig1ax1 = utils.add_plots(fig1ax1,t_s,[q_vy,d_vy,vy_e],["-","--","-"],["g","r","b"],["quad Vy","des Vy","Vy error"],"Y axis linear Velocities of quadrotor",'t {s}','Vy {m/s}')
     fig1ax1.legend(loc='lower right', shadow=True, fontsize='small')  
 
     #  Z Linear velocity
@@ -156,27 +118,15 @@ def record(name):
     d_vz = map(lambda a: a.vel[2], d_s)   
     vz_e = map(lambda a,b: a-b,d_vz,q_vz)
 
-    fig1ax2.plot(t_s, q_vz, linestyle = "-", color = "g", label = "quad Vz")
-    fig1ax2.plot(t_s, d_vz, linestyle = "--", color = "r", label = "des Vz")
-    fig1ax2.plot(t_s, vz_e, linestyle = "-", color = "b", label = "Vz error")
-    fig1ax2.set_title("Z axis linear Velocities of quadrotor")
-    fig1ax2.set_xlabel('t {s}')
-    fig1ax2.set_ylabel('Vz {m/s}')
+    fig1ax2 = utils.add_plots(fig1ax2,t_s,[q_vz,d_vz,vz_e],["-","--","-"],["g","r","b"],["quad Vz","des Vz","Vz error"],"Z axis linear Velocities of quadrotor",'t {s}','Vz {m/s}')
     fig1ax2.legend(loc='lower right', shadow=True, fontsize='small')  
 
     # Angular velocities
-
-    # Euler angles
     q_wx = map(lambda a: a[3][0]*180.0/np.pi, q_s)
     q_wy = map(lambda a: a[3][1]*180.0/np.pi, q_s)
     q_wz = map(lambda a: a[3][2]*180.0/np.pi, q_s)
 
-    fig1ax3.plot(t_s, q_wx, linestyle = "-", color = "r", label = "wx")
-    fig1ax3.plot(t_s, q_wy, linestyle = "-", color = "g", label = "wy")
-    fig1ax3.plot(t_s, q_wz, linestyle = "-", color = "b", label = "wz")
-    fig1ax3.set_title("Angular velocities of quadrotor")
-    fig1ax3.set_xlabel('t {s}')
-    fig1ax3.set_ylabel('wx, wy, wz {degree/s}')
+    fig1ax3 = utils.add_plots(fig1ax3,t_s,[q_wx,q_wy,q_wz],["-","-","-"],["r","g","b"],["wx","wy","wz"],"Angular velocities of quadrotor",'t {s}','wx, wy, wz {degree/s}')
     fig1ax3.legend(loc='lower right', shadow=True, fontsize='small')
 
     # save
