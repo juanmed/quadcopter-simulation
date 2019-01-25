@@ -273,8 +273,8 @@ def generate_helix_trajectory(t, t_max):
     jerk = np.array([[j_x,j_y,j_z]])
     snap = np.array([[s_x,s_y,s_z]])
 
-
     return DesiredState(pos, vel, acc, jerk, snap, yaw, yawdot, yawddot)
+
 
 def get_poly_cc(n, k, t):
     """ This is a helper function to get the coeffitient of coefficient for n-th

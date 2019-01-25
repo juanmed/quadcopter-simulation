@@ -12,7 +12,7 @@ def RotToRPY(R):
     phi = asin(R[1,2])
     theta = atan2(-R[0,2]/cos(phi),R[2,2]/cos(phi))
     psi = atan2(-R[1,0]/cos(phi),R[1,1]/cos(phi))
-    return phi, theta, psi
+    return np.array([phi, theta, psi])
 
 def RPYToRot(phi, theta, psi):
     """
@@ -82,3 +82,12 @@ def outputTraj(x,y,z):
     output.append((x,y,z))
     with open('traj.out', 'w') as fp:
         fp.write('\n'.join('%s %s %s' % item for item in output))
+
+def add_plots(ax,x,datas,lines,cols,labs,tit,xlab,ylab):
+
+    for (data, line, colr, labl) in zip(datas, lines, cols, labs):
+        ax.plot(x,data, linestyle = line, color = colr, label = labl)
+    ax.set_title(tit)
+    ax.set_xlabel(xlab)
+    ax.set_ylabel(ylab)
+    return ax
