@@ -14,14 +14,14 @@ import dif_flat as dfl
 from utils.utils import RPYToRot, RPYToRot2
 
 # LQR Translational gains and reference input matrices
-Kt = np.matrix([3.162277, 2.70639])
+Kt = np.matrix([10., 4.5825])
 Nu_t = np.matrix([0.0])
 Nx_t = np.matrix([[1.0],[0.0]])
 
 
 
 # LQR Rotational gains
-Kr = 3.162277
+Kr = 2.23606
 Nu_r = 0.0
 Nx_r = 1.0
 

@@ -183,14 +183,14 @@ def compute_ref(trajectory):
 	# This should be changed to use np.arrays only as np.matrix is not recommended anymore
 
 	# extract all quantities from given trajectory
-	pos_traj = trajectory[0] 
-	vel_traj = trajectory[1]
-	acc_traj = trajectory[2]
-	jerk_traj = trajectory[3]
-	snap_traj = trajectory[4]
-	yaw_traj = trajectory[5]
-	yaw_dot_traj = trajectory[6]
-	yaw_ddot_traj = trajectory[7]
+	pos_traj = trajectory[0] # 3-vector
+	vel_traj = trajectory[1] # 3-vector
+	acc_traj = trajectory[2] # 3-vector
+ 	jerk_traj = trajectory[3] # 3-vector
+	snap_traj = trajectory[4] # 3-vector
+	yaw_traj = trajectory[5] # scalar
+	yaw_dot_traj = trajectory[6] # scalar
+	yaw_ddot_traj = trajectory[7] # scalar
 
 	# convert all vectors from np.array to np.matrix for compatibility and
 	# ease
@@ -203,23 +203,24 @@ def compute_ref(trajectory):
 	yaw_dot_traj = np.matrix(yaw_dot_traj)
 	yaw_ddot_traj = np.matrix(yaw_ddot_traj)
 
-	t_vec = get_t_vector(acc_traj.item(0), acc_traj.item(1), acc_traj.item(2))
+	t_vec = get_t_vector(acc_traj.item(0), acc_traj.item(1), acc_traj.item(2)) #get_t_vector(sigma1, sigma2,sigma3)
 
 	u_1 = get_u1(t_vec)
 	z_b = get_zb(t_vec)
 	y_c = get_yc(yaw_traj.item(0))
-	x_b = get_xb(y_c,z_b)
-	y_b = get_yb(z_b,x_b)
+	x_b = get_xb(y_c,z_b) # get_xb(y_c,z_b)
+	y_b = get_yb(z_b,x_b) # get_yb(z_b,x_b)
 	j_ = np.matrix([[jerk_traj.item(0)],[jerk_traj.item(1)],[jerk_traj.item(2)]])
-	w_x = get_wx(y_b,j_,u_1)
-	w_y = get_wy(x_b,j_,u_1)
-	x_c = get_xc(yaw_traj.item(0))
-	w_z = get_wz(yaw_dot_traj.item(0),x_c,x_b,w_y,y_c,z_b)
-	u_1_dot = get_u1_dot(z_b,j_)
+	w_x = get_wx(y_b,j_,u_1) # get_wx(y_b,j,u_1)
+	w_y = get_wy(x_b,j_,u_1) # get_wy(x_b,j,u_1)
+	x_c = get_xc(yaw_traj.item(0)) 
+	w_z = get_wz(yaw_dot_traj.item(0),x_c,x_b,w_y,y_c,z_b) # get_wz(psi_rate,x_c,x_b,w_y,y_c,z_b)
+	u_1_dot = get_u1_dot(z_b,j_) #get_u1_dot(z_b,j)
 	s_ = np.matrix([[snap_traj.item(0)],[snap_traj.item(1)],[snap_traj.item(2)]])
-	w_y_dot = get_wy_dot(x_b,s_,u_1_dot,w_y,u_1,w_x,w_z)
-	w_x_dot = get_wx_dot(y_b, s_, u_1_dot, w_x, u_1, w_y, w_z)
+	w_y_dot = get_wy_dot(x_b,s_,u_1_dot,w_y,u_1,w_x,w_z) # get_wy_dot(x_b,s,u_1_dot,w_y,u_1,w_x,w_z)
+	w_x_dot = get_wx_dot(y_b, s_, u_1_dot, w_x, u_1, w_y, w_z) # get_wx_dot(y_b,s,u_1_dot,w_x,u_1,w_y,w_z)
 	w_z_dot = get_wz_dot(yaw_ddot_traj.item(0),x_c, x_b, yaw_dot_traj.item(0), w_z, y_b, w_y, z_b, w_x, y_c, w_y_dot)
+	        # get_wz_dot(psi_acc,x_c,x_b,psi_rate,w_z,y_b,w_y,z_b,w_x,y_c,w_y_dot) 
 	
 	# make angular acceleration vector w_dot
 	# remember each element is a 1x1 matrix so have to extract that element...
@@ -229,7 +230,7 @@ def compute_ref(trajectory):
 	w_ = np.matrix([[w_x.item(0)],[w_y.item(0)],[w_z.item(0)]])
 
 	# get vector of torque inputs u2, u3, u4
-	u_x = get_ux(w_dot_, w_)
+	u_x = get_ux(w_dot_, w_) # get_ux(w_dot_,w_)
 
 	# get rotation matrix from base frame to world frame
 	# for current desired trajectory point.
@@ -251,13 +252,13 @@ def compute_ref(trajectory):
 	# compute u_a input for system reference
 	# can be computed as follows or simply the received acc_traj
 	# vector after conversion to matrix. Both are exactly the same quantity
-	u_a = get_ua(u_1, z_b)
+	u_a = get_ua(u_1, z_b) # get_ua(u_1,z_b)
 
 	# compute u_b input for system reference
-	u_b = get_ub(w_, u_x)
+	u_b = get_ub(w_, u_x) # get_ub(w_,M)
 
 	# compute u_c input for system reference
-	u_c = get_uc(w_,or_)
+	u_c = get_uc(w_,or_) #  get_uc(w_,ori)
 
 	# we need to return back the 1) reference state vector and 2) reference inputs
 	# The reference state vector is : (x,y,z, v_x, v_y, v_z, phi, theta, psi, p, q, r)
