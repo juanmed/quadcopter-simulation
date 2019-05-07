@@ -67,19 +67,19 @@ def record(name):
     fig0ax1.legend(loc='lower right', shadow=True, fontsize='small')
 
     # X position
-    q_x = map(lambda a: a[0][0], q_s)   # get quad x position
+    q_x = map(lambda a: a[0][0]*-1.0, q_s)   # get quad x position
     d_x = map(lambda a: a.pos[0], d_s)  # get desired x position
     x_e = map(lambda a,b: a-b,d_x,q_x)  # compute error
 
-    fig0ax2 = utils.add_plots(fig0ax2,t_s,[q_x,d_x,x_e],["-","--","-"],["g","r","b"],["quad x","des x","x error"],"X - axis position of quadrotor","t {s}","x {m}")
+    fig0ax2 = utils.add_plots(fig0ax2,t_s,[q_x,d_x,x_e],["-","--","-"],["g","r","b"],["quad -x","des x","x error"],"X - axis position of quadrotor","t {s}","x {m}")
     fig0ax2.legend(loc='lower right', shadow=True, fontsize='small')
 
     # Y position
-    q_y = map(lambda a: a[0][1], q_s)
+    q_y = map(lambda a: a[0][1]*-1.0, q_s)
     d_y = map(lambda a: a.pos[1], d_s)
     y_e = map(lambda a,b: a-b,d_y,q_y)
 
-    fig0ax3 = utils.add_plots(fig0ax3,t_s,[q_y,d_y,y_e],["-","--","-"],["g","r","b"],["quad y","des y","y error"],"Y - axis position of quadrotor","t {s}","y {m}")
+    fig0ax3 = utils.add_plots(fig0ax3,t_s,[q_y,d_y,y_e],["-","--","-"],["g","r","b"],["quad -y","des y","y error"],"Y - axis position of quadrotor","t {s}","y {m}")
     fig0ax3.legend(loc='lower right', shadow=True, fontsize='small')
 
     # Z position
@@ -95,7 +95,7 @@ def record(name):
     q_theta = map(lambda a: a[2][1]*180.0/np.pi, q_s)
     q_psi = map(lambda a: a[2][2]*180.0/np.pi, q_s)
 
-    fig0ax5 = utils.add_plots(fig0ax5,t_s,[q_phi,q_theta,q_psi],["-","--","-"],["r","g","b"],["phi","theta","psi"],"Angular position of quadrotor",'t {s}','phi, theta, psi {degree}')
+    fig0ax5 = utils.add_plots(fig0ax5,t_s,[q_phi,q_theta,q_psi],["-","-","-"],["r","g","b"],["phi","theta","psi"],"Angular position of quadrotor",'t {s}','phi, theta, psi {degree}')
     fig0ax5.legend(loc='lower right', shadow=True, fontsize='small')
 
     #  X Linear velocity
@@ -103,7 +103,7 @@ def record(name):
     d_vx = map(lambda a: a.vel[0], d_s)   
     vx_e = map(lambda a,b: a-b,d_vx,q_vx)
 
-    fig1ax0 = utils.add_plots(fig1ax0,t_s,[q_vx,q_vx,vx_e],["-","--","-"],["g","r","b"],["quad Vx","des Vx","Vx error"],"X axis linear Velocities of quadrotor",'t {s}','Vx {m/s}')
+    fig1ax0 = utils.add_plots(fig1ax0,t_s,[q_vx,d_vx,vx_e],["-","--","-"],["g","r","b"],["quad Vx","des Vx","Vx error"],"X axis linear Velocities of quadrotor",'t {s}','Vx {m/s}')
     fig1ax0.legend(loc='lower right', shadow=True, fontsize='small')   
 
     #  Y Linear velocity
@@ -131,13 +131,13 @@ def record(name):
     fig1ax3.legend(loc='lower right', shadow=True, fontsize='small')
 
     # save
-    fig0.savefig("t_"+name, dpi = 200) #translation variables
-    fig1.savefig("r_"+name, dpi = 200) #rotation variables
+    fig0.savefig("t_"+name, dpi = 300) #translation variables
+    fig1.savefig("r_"+name, dpi = 300) #rotation variables
 
 def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
-
-    #desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints, coeff_x, coeff_y, coeff_z)
-    desired_state = trajGen3D.generate_helix_trajectory(time[0], 1.2)  
+    print(time[0])
+    desired_state = trajGen3D.generate_trajectory(time[0], 1.0, waypoints, coeff_x, coeff_y, coeff_z)
+    #desired_state = trajGen3D.generate_helix_trajectory(time[0], 5.0)  
     F, M = df.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
@@ -151,12 +151,13 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
 
 
 def main():
-    pos = (0.5,0,0)
+    pos = (0.0,0,0)
     attitude = (0,0,0)
     quadcopter = Quadcopter(pos, attitude)
-    waypoints = trajGen3D.get_helix_waypoints(6, 9)
+    waypoints = trajGen3D.get_poly_waypoints(6, 2)
+    #print(waypoints)
     (coeff_x, coeff_y, coeff_z) = trajGen3D.get_MST_coefficients(waypoints)
-
+    #print("Coeffx: {}".format(coeff_x))
     def control_loop(i):
         for _ in range(control_iterations):
             attitudeControl(quadcopter, time, waypoints, coeff_x, coeff_y, coeff_z)
@@ -164,9 +165,9 @@ def main():
 
     plot_quad_3d(waypoints, control_loop)
 
-    if(True): # save inputs and states graphs
+    if(False): # save inputs and states graphs
         print("Saving figures...")
-        record("pid.jpg")
+        record("df.jpg")
     print("Closing.")
 
 if __name__ == "__main__":

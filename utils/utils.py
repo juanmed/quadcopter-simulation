@@ -29,6 +29,9 @@ def RPYToRot(phi, theta, psi):
 def RPYToRot2(phi, theta, psi):
     """
     phi, theta, psi = roll, pitch , yaw
+    The euler angle convention used is ZYX. This means: first a rotation of psi-degrees
+    around Z axis, then rotation of theta-degrees around Y axis, and finally rotation of 
+    phi-degress around X axis 
     """
     return np.array([[cos(theta)*cos(psi), cos(theta)*sin(psi), -sin(theta)],
                      [-cos(phi)*sin(psi) + sin(phi)*sin(theta)*cos(psi), cos(phi)*cos(psi) + sin(phi)*sin(theta)*sin(psi), sin(phi)*cos(theta)],
