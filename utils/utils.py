@@ -8,13 +8,22 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 import numpy as np
 from math import sin, cos, asin, atan2, sqrt
 
-def RotToRPY(R):
+def RotToRPY_ZXY(R):
     phi = asin(R[1,2])
     theta = atan2(-R[0,2]/cos(phi),R[2,2]/cos(phi))
     psi = atan2(-R[1,0]/cos(phi),R[1,1]/cos(phi))
     return np.array([phi, theta, psi])
 
-def RPYToRot(phi, theta, psi):
+def RotToRPY_ZYX(R):
+    """
+    Get euler angles from rotation matrix using ZYX convention
+    """
+    theta = -asin(R[0,2])
+    phi = atan2(R[1,2]/cos(theta), R[2,2]/cos(theta))
+    psi = atan2(R[0,1]/cos(theta), R[0,0]/cos(theta))
+    return np.array([phi, theta, psi])
+
+def RPYToRot_ZXY(phi, theta, psi):
     """
     phi, theta, psi = roll, pitch , yaw
     The euler angle convention used is ZXY. This means: first a rotation of psi-degrees
@@ -26,7 +35,7 @@ def RPYToRot(phi, theta, psi):
                      [cos(psi)*sin(theta) + cos(theta)*sin(phi)*sin(psi), sin(psi)*sin(theta) - cos(psi)*cos(theta)*sin(phi), cos(phi)*cos(theta)]])
 
 
-def RPYToRot2(phi, theta, psi):
+def RPYToRot_ZYX(phi, theta, psi):
     """
     phi, theta, psi = roll, pitch , yaw
     The euler angle convention used is ZYX. This means: first a rotation of psi-degrees

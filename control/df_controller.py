@@ -14,7 +14,7 @@ import model.params as params
 from math import sin, cos
 
 import dif_flat as dfl
-from utils.utils import RPYToRot, RPYToRot2
+from utils.utils import RPYToRot_ZYX
 
 # LQR Translational gains and reference input matrices
 Kt = np.matrix([10., 4.5825])
@@ -137,10 +137,9 @@ def run(quad, des_state):
     # Now apply the inverse function to obtain F and M  
 
     # First obtain F = Rbw*Z_b(m*ua_s +g*Z_w)
-    R = np.matrix(RPYToRot(phi, theta, psi)) # this rotation is world to body frame
-    #R = np.matrix(RPYToRot2(phi_r.item(0), theta_r.item(0), psi_r.item(0))) # this rotation is world to body frame
+    R = np.matrix(RPYToRot_ZYX(phi, theta, psi)) # this rotation is world to body frame
 
-    #R = R.T  # I need body to world frame
+    R = R.T  # I need body to world frame
 
     Z_b = np.matrix([[0.0],[0.0],[1.0]])  # this is z axis of body expressed in body frame
     Z_w = np.matrix([[0.0],[0.0],[1.0]])  # the Z axis of world frame expressed in body frame is equal to Z_b...

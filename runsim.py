@@ -135,10 +135,10 @@ def record(name):
     fig1.savefig("r_"+name, dpi = 300) #rotation variables
 
 def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
-    print(time[0])
+    #print(time[0])
     desired_state = trajGen3D.generate_trajectory(time[0], 1.0, waypoints, coeff_x, coeff_y, coeff_z)
     #desired_state = trajGen3D.generate_helix_trajectory(time[0], 5.0)  
-    F, M = df.run(quad, desired_state)
+    F, M = pid.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
 
@@ -154,7 +154,7 @@ def main():
     pos = (0.0,0,0)
     attitude = (0,0,0)
     quadcopter = Quadcopter(pos, attitude)
-    waypoints = trajGen3D.get_poly_waypoints(6, 2)
+    waypoints = trajGen3D.get_helix_waypoints(9, 9)
     #print(waypoints)
     (coeff_x, coeff_y, coeff_z) = trajGen3D.get_MST_coefficients(waypoints)
     #print("Coeffx: {}".format(coeff_x))

@@ -8,7 +8,10 @@ Please feel free to use and modify this, but keep the above information. Thanks!
 import numpy as np
 import scipy.integrate as integrate
 from utils.quaternion import Quaternion
-from utils.utils import RPYToRot, RotToQuat, RotToRPY
+#from utils.utils import RPYToRot, RotToQuat, RotToRPY
+from utils.utils import RotToQuat
+from utils.utils import RPYToRot_ZYX as RPYToRot
+from utils.utils import RotToRPY_ZYX as RotToRPY
 import model.params as params
 
 class Quadcopter:
