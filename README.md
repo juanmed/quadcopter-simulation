@@ -9,11 +9,20 @@ Motivation
 -----
 I have been playing and studying quadcopter in my spare time since 2014 when I first bought a crazyflie. There are many interesting projects around already, like vision-based SLAM, hover control and advance manoeuvre, etc. However, there are very few open source quadcopter simulator which helps a beginner to overcome the mental barrier of understanding the underlying physics. There are a lot of research papers on the topic of quadcopter control and autonomous application, but none of those can be made possible without a decent simulation tool. This project aims to address that. Thanks to Coursera's online course Aerial Robotics by Professor Vijay Kumar, which presents quadcopter's motion equations in detail, I was then inspired and finally able to write this from scratch.
 
+Install
+-----
+
+1. Install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
+2. In the location you prefer, open a terminal and:
+```bash
+git clone https://github.com/juanmed/quadcopter-simulation
+python -m pip2 install -r requirements.txt
+```
 To Run
 -----
 The simulator only uses matplotlib and scipy. You can simply run the following:
-```
-make
+
+```bash 
 python runsim.py
 ```
 

@@ -25,7 +25,7 @@ control_frequency = 200 # Hz for attitude control loop
 control_iterations = control_frequency / animation_frequency
 dt = 1.0 / control_frequency
 time = [0.0]
-
+sim_time = 2*np.pi
 
 # variables to plot
 F_t = list()  # Thrust
@@ -67,7 +67,7 @@ def record(name):
     fig0ax1.legend(loc='lower right', shadow=True, fontsize='small')
 
     # X position
-    q_x = map(lambda a: a[0][0]*-1.0, q_s)   # get quad x position
+    q_x = map(lambda a: a[0][0], q_s)   # get quad x position
     d_x = map(lambda a: a.pos[0], d_s)  # get desired x position
     x_e = map(lambda a,b: a-b,d_x,q_x)  # compute error
 
@@ -75,7 +75,7 @@ def record(name):
     fig0ax2.legend(loc='lower right', shadow=True, fontsize='small')
 
     # Y position
-    q_y = map(lambda a: a[0][1]*-1.0, q_s)
+    q_y = map(lambda a: a[0][1], q_s)
     d_y = map(lambda a: a.pos[1], d_s)
     y_e = map(lambda a,b: a-b,d_y,q_y)
 
@@ -133,12 +133,13 @@ def record(name):
     # save
     fig0.savefig("t_"+name, dpi = 300) #translation variables
     fig1.savefig("r_"+name, dpi = 300) #rotation variables
+    print("Saved t_{} and r_{}.".format(name,name))
 
 def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     #print(time[0])
-    desired_state = trajGen3D.generate_trajectory(time[0], 1.0, waypoints, coeff_x, coeff_y, coeff_z)
-    #desired_state = trajGen3D.generate_helix_trajectory(time[0], 5.0)  
-    F, M = df.run(quad, desired_state)
+    desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints, coeff_x, coeff_y, coeff_z)
+    #desired_state = trajGen3D.generate_helix_trajectory(time[0], sim_time)  
+    F, M = pid.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
 
@@ -151,10 +152,10 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
 
 
 def main():
-    pos = (0.5,0,0)
+    pos = (0.5,0,0) 
     attitude = (0,0,0)
     quadcopter = Quadcopter(pos, attitude)
-    waypoints = trajGen3D.get_helix_waypoints(9, 9)
+    waypoints = trajGen3D.get_helix_waypoints(sim_time, 9)
     #print(waypoints)
     (coeff_x, coeff_y, coeff_z) = trajGen3D.get_MST_coefficients(waypoints)
     #print("Coeffx: {}".format(coeff_x))
@@ -167,8 +168,8 @@ def main():
 
     if(False): # save inputs and states graphs
         print("Saving figures...")
-        record("df.jpg")
-    print("Closing.")
+        record("lqr.jpg")
+    print(">> Closing.")
 
 if __name__ == "__main__":
     main()

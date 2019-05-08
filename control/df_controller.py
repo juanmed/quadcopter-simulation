@@ -60,7 +60,7 @@ def run(quad, des_state):
     w_ref = np.array(ref_[3])
     Rbw_ref = np.array(ref_[6])
     w_dot_ref = np.array(ref_[5])
-    print("w_dot_ref: {}".format(w_dot_ref.flatten()))
+    #print("w_dot_ref: {}".format(w_dot_ref.flatten()))
 
     # get drone state
     pos = quad.position().reshape(3,1)
@@ -143,7 +143,7 @@ def get_wdes(Rbw, Rbw_des, Rbw_ref_dot, w_ref):
     # Feedback term calculation
     k10 = 5.0
     epsilon = 0.01
-    k1 = k10  #k10/(1.0 + np.dot(zb.T, zb_r)[0][0] + epsilon)
+    k1 = k10/(1.0 + np.dot(zb.T, zb_r)[0][0] + epsilon)
     lambda_dot = 0.0
     lambda_ = 5.0
     w_fb = (k1 + lambda_dot/lambda_)*np.cross(zb, zb_r, axis= 0)

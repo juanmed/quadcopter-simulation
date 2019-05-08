@@ -211,9 +211,9 @@ def generate_trajectory(t, v, waypoints, coeff_x, coeff_y, coeff_z):
         if(abs(yawdot) > max_yawdot):
             yawdot = (yawdot/abs(yawdot))*max_yawdot # make it 5rad/s with appropriate direction
         
-        yaw = np.sin(2*t)#0
-        yawdot = 2*np.cos(2*t) #0
-        yawddot = -4*np.sin(2*t)
+        yaw = np.sin(2*t)*0.0
+        yawdot = 2*np.cos(2*t)*0.0
+        yawddot = -4*np.sin(2*t)*0.0
     return DesiredState(pos, vel, acc, jerk, snap, yaw, yawdot, yawddot)
 
 def generate_helix_trajectory(t, t_max):
@@ -242,32 +242,32 @@ def generate_helix_trajectory(t, t_max):
         z = c*t
         #psi = 0.0*np.ones_like(t)
         #tangent_vector = map(lambda a,b,c: np.matrix([[a],[b],[0]]),-a*wx*np.sin(wx*t),b*wy*np.cos(wy*t),c)
-        yaw = np.sin(t)
+        yaw = np.sin(t)*0.0
         #psi = np.arccos( )
 
         # velocities in helix
         v_x = -a*wx*np.sin(wx*t)
         v_y = b*wy*np.cos(wy*t)
         v_z = c*np.ones_like(t)
-        yawdot = np.cos(t)#0.0*np.ones_like(t)
+        yawdot = np.cos(t)*0.0#0.0*np.ones_like(t)
 
         # accelerations in helix
         a_x = -(wx**2)*(x - x_0)
         a_y = -(wy**2)*(y - y_0)
         a_z = 0.0*np.ones_like(t)
-        yawddot = -1.0*np.sin(t)#0.0*np.ones_like(t)
+        yawddot = 0.0*np.sin(t)#0.0*np.ones_like(t)
 
         # jerks in helix
         j_x = -(wx**2)*(v_x)
         j_y = -(wy**2)*(v_y)
         j_z = 0.0*np.ones_like(t)
-        yaw_ddd = -1.0*np.cos(t)#0.0*np.ones_like(t)
+        yaw_ddd = 0.0*np.cos(t)#0.0*np.ones_like(t)
 
         # snap in helix
         s_x = -(wx**2)*(a_x)
         s_y = -(wy**2)*(a_y)
         s_z = 0.0*np.ones_like(t)
-        yaw_dddd = np.sin(t) #0.0*np.ones_like(t)
+        yaw_dddd = 0.0*np.sin(t) #0.0*np.ones_like(t)
 
 
     else:
@@ -278,7 +278,7 @@ def generate_helix_trajectory(t, t_max):
         z = c*t_max
         #psi = 0.0*np.ones_like(t)
         #tangent_vector = map(lambda a,b,c: np.matrix([[a],[b],[0]]),-a*wx*np.sin(wx*t),b*wy*np.cos(wy*t),c)
-        yaw = np.sin(t_max)
+        yaw = 0.0*np.sin(t_max)
         #psi = np.arccos( )
 
         # velocities in helix
