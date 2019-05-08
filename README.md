@@ -3,7 +3,7 @@ Quadcopter 3D Simulator
 
 The project simulates a quadcopter in 3D environment. It contains a basic quadcopter dynamics model, hover controller, trajectory generator, visualisation toolkit and a top level scheduler which runs each module at a specific rate.
 
-![alt tag](https://github.com/hbd730/quadcopter-simulator/blob/master/sim.gif)
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/sim.gif)
 
 Motivation
 -----
@@ -11,6 +11,7 @@ I have been playing and studying quadcopter in my spare time since 2014 when I f
 
 Install
 -----
+The simulator uses numpy, matplotlib, control, slycot and scipy.
 
 1. Install [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git).
 2. In the location you prefer, open a terminal and:
@@ -20,7 +21,6 @@ python -m pip2 install -r requirements.txt
 ```
 To Run
 -----
-The simulator only uses matplotlib and scipy. You can simply run the following:
 
 ```bash 
 python runsim.py

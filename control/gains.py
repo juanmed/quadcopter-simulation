@@ -56,7 +56,6 @@
 # System division that we use to compute constants in a simpler manner.
 
 
-import rospy
 import control as ctl
 import numpy as np 
 
