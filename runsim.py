@@ -138,7 +138,7 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     #print(time[0])
     desired_state = trajGen3D.generate_trajectory(time[0], 1.0, waypoints, coeff_x, coeff_y, coeff_z)
     #desired_state = trajGen3D.generate_helix_trajectory(time[0], 5.0)  
-    F, M = pid.run(quad, desired_state)
+    F, M = df.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
 
@@ -151,7 +151,7 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
 
 
 def main():
-    pos = (0.0,0,0)
+    pos = (0.5,0,0)
     attitude = (0,0,0)
     quadcopter = Quadcopter(pos, attitude)
     waypoints = trajGen3D.get_helix_waypoints(9, 9)

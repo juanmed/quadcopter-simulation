@@ -14,6 +14,7 @@ import model.params as params
 from math import sin, cos
 
 import dif_flat as dfl
+import gains
 from utils.utils import RPYToRot_ZYX
 
 # LQR Translational gains and reference input matrices
@@ -27,6 +28,10 @@ Nx_t = np.matrix([[1.0],[0.0]])
 Kr = 2.23606
 Nu_r = 0.0
 Nx_r = 1.0
+
+Kp = np.diag([gains.Kpx2, gains.Kpy2, gains.Kpz2])
+Kd = np.diag([gains.Kdx2, gains.Kdy2, gains.Kdz2])
+Ki = np.diag([gains.Kix2, gains.Kiy2, gains.Kiz2])
 
 def run(quad, des_state):
 
@@ -47,120 +52,109 @@ def run(quad, des_state):
     # compute reference states and inputs from desired trajectory
     ref_ = dfl.compute_ref(trajectory)
     #print(ref_)
-    # extract each reference state and inputs
-    x_r,y_r,z_r = ref_[0]
-    vx_r,vy_r,vz_r = ref_[1]
-    phi_r,theta_r,psi_r = ref_[2]
-    p_r,q_r,r_r = ref_[3]
 
+    # extract each reference state and inputs
+    pos_ref = np.array(ref_[0])
+    v_ref = np.array(ref_[1])
+    or_ref = np.array(ref_[2])
+    w_ref = np.array(ref_[3])
+    Rbw_ref = np.array(ref_[6])
+    w_dot_ref = np.array(ref_[5])
+    print("w_dot_ref: {}".format(w_dot_ref.flatten()))
 
     # get drone state
-    x, y, z = quad.position()
-    x_dot, y_dot, z_dot = quad.velocity()
-    phi, theta, psi = quad.attitude()
-    p, q, r = quad.omega()
+    pos = quad.position().reshape(3,1)
+    v = quad.velocity().reshape(3,1)
+    or_ = quad.attitude().reshape(3,1)
+    Rwb = RPYToRot_ZYX(or_[0][0], or_[1][0], or_[2][0])
+    Rbw = Rwb.T
+    phi, theta, psi = dfl.RotToRPY_ZYX(Rbw)
+    w = quad.omega().reshape(3,1)
+    #print(pos)
 
+    #pos = np.array([[x],[y],[z]])
+    #v = np.array([[vx_r],[vy_r],[vz_r]])
 
-
-    # compute state error
-    # state error = reference_state - drone_state
-    #print("*** {} , {}".format(x_r,x))
-    x_e = x_r.item(0) - x
-    y_e = y_r.item(0) - y
-    z_e = z_r.item(0) - z
-
-    vx_e = vx_r.item(0) - x_dot
-    vy_e = vy_r.item(0) - y_dot
-    vz_e = vz_r.item(0) - z_dot
-
-    phi_e = phi_r.item(0) - phi
-    theta_e = theta_r.item(0) - theta
-    psi_e = psi_r.item(0) - psi
-
-    p_e = p_r.item(0) - p
-    q_e = q_r.item(0) - q   
-    r_e = r_r.item(0) - r
-
-    """
-    # compute error input
-    ua_e_x = -1.0*Kt*np.matrix([[x_e],[vx_e]])
-    ua_e_y = -1.0*Kt*np.matrix([[y_e],[vy_e]])
-    ua_e_z = -1.0*Kt*np.matrix([[z_e],[vz_e]])
-    ua_e = np.matrix([[ua_e_x.item(0)],[ua_e_y.item(0)],[ua_e_z.item(0)]])
-
-    ub_e_x = -1.0*Kr*p_e
-    ub_e_y = -1.0*Kr*q_e    
-    ub_e_z = -1.0*Kr*r_e  
-    ub_e = np.matrix([[ub_e_x],[ub_e_y],[ub_e_z]])
-
-    uc_e_x = -1.0*Kr*phi_e
-    uc_e_y = -1.0*Kr*theta_e
-    uc_e_z = -1.0*Kr*psi_e
-    uc_e = np.matrix([[uc_e_x],[uc_e_y],[uc_e_z]])
-    """
-    # In general    u = -K*x + (N_u + K*N_x)*r
-    # r = reference state
-    # x = state
-    # K = LQR gains
-    # N_u, N_x = refrence input and reference state matrices
-
+    # ------------------------ #
+    #  Compute thrust
+    # ------------------------ #
     
-    x_state = np.matrix([[x],[x_dot]])
-    ua_e_x = -Kt*x_state + (Nu_t + Kt*Nx_t)*x_r
-
-    y_state = np.matrix([[y],[y_dot]])
-    ua_e_y = -Kt*y_state + (Nu_t + Kt*Nx_t)*y_r
-
-    z_state = np.matrix([[z],[z_dot]])
-    ua_e_z = -Kt*z_state + (Nu_t + Kt*Nx_t)*z_r
-    ua_e = np.matrix([[ua_e_x.item(0)],[ua_e_y.item(0)],[ua_e_z.item(0)]])
-
-    #wx_state = np.matrix([[z],[z_dot]])
-    ub_e_x = -Kr*p + (Nu_r + Kr*Nx_r)*p_r.item(0)
-    ub_e_y = -Kr*q + (Nu_r + Kr*Nx_r)*q_r.item(0)   
-    ub_e_z = -Kr*r + (Nu_r + Kr*Nx_r)*r_r.item(0) 
-    ub_e = np.matrix([[ub_e_x],[ub_e_y],[ub_e_z]])
-
-    #   THIS HAS TO BE CHANGED!
-    #uc_e_x = -1.0*Kr*phi_e
-    #uc_e_y = -1.0*Kr*theta_e
-    #uc_e_z = -1.0*Kr*psi_e
-    #uc_e = np.matrix([[uc_e_x],[uc_e_y],[uc_e_z]])    
+    ua_e = -1.0*np.dot(Kp,pos-pos_ref) -1.0*np.dot(Kd,v-v_ref) #-1.0*np.dot(Ki,self.pos_err)  # PID control law
     
+    ua_ref = np.array(ref_[4])
 
-    # compute inputs to system
-    # u_s = u_e + u_r
-    ua_s = ua_e + ref_[4]
-    ub_s = ub_e + ref_[5]
-    #uc_s = uc_e + ref_[6]
+    ua = ua_e + ua_ref
 
-    # Now apply the inverse function to obtain F and M  
+    e_3 = np.array([[0.0],[0.0],[1.0]])  # this is z axis of body expressed in body frame
+    Z_w = np.array([[0.0],[0.0],[1.0]])  # the Z axis of world frame expressed in body frame is equal to Z_b...
+    wzb = np.dot(Rbw, e_3)
 
-    # First obtain F = Rbw*Z_b(m*ua_s +g*Z_w)
-    R = np.matrix(RPYToRot_ZYX(phi, theta, psi)) # this rotation is world to body frame
+    F = params.mass*np.dot(wzb.T, (ua + params.g*Z_w))[0][0]
 
-    R = R.T  # I need body to world frame
+    # ------------------------ #
+    #  Compute desired orientation
+    # ------------------------ #
+    zb_des = (ua + params.g*Z_w)/np.linalg.norm(ua + params.g*Z_w)
+    yc_des = np.array(dfl.get_yc(or_ref[2][0]))   #transform to np.array 'cause comes as np.matrix
+    xb_des = np.cross(yc_des, zb_des, axis=0)
+    xb_des = xb_des/np.linalg.norm(xb_des)
+    yb_des = np.cross(zb_des, xb_des, axis = 0)
+    Rbw_des = np.concatenate((xb_des, yb_des, zb_des), axis=1)
 
-    Z_b = np.matrix([[0.0],[0.0],[1.0]])  # this is z axis of body expressed in body frame
-    Z_w = np.matrix([[0.0],[0.0],[1.0]])  # the Z axis of world frame expressed in body frame is equal to Z_b...
-    F = (Z_b.T)*R*(params.mass*(ua_s + params.g*Z_w))
+    # ------------------------ #
+    #  Compute desired angular velocity
+    # ------------------------ #    
+    w_des = get_wdes(Rbw, Rbw_des, Rbw_des, w_ref)
+    #print(">> Wdes: {}".format(np.linalg.norm(w_des)))
 
-    # Now obtain moments
-    omega = np.matrix([[p],[q],[r]])
-    #omega = np.matrix([[p_r.item(0)],[q_r.item(0)],[r_r.item(0)]])
+    # ------------------------ #
+    #  Compute control torque
+    # ------------------------ # 
+    K_omega = 0.17
+    M = -K_omega*(w - w_des) + np.cross(w,np.dot(params.I,w_des), axis = 0) + np.dot(params.I, w_dot_ref)
 
-    Inertia = np.matrix(params.I)
-    M = Inertia*ub_s + np.matrix(np.cross(omega,Inertia*omega, axis = 0))
-    # convert to numpy array for it to work with the rest of the code
-    M = np.array([[M.item(0)],[M.item(1)],[M.item(2)]])
 
-    # overwrite
-    #F = ref_[7]
-    #M = ref_[8]
-    #M = np.array([[M.item(0)],[M.item(1)],[M.item(2)]])
-
-    #print(F.item(0))
-    #print(M)
-    #F = 1.0
-    #M = np.array([[0.0],[0.0],[0.0]])
     return F.item(0), M
+
+def get_wdes(Rbw, Rbw_des, Rbw_ref_dot, w_ref):
+    """
+    Calculation of desired angular velocity. See:
+
+    Pucci, D., Hamel, T., Morin, P., & Samson, C. (2014). 
+    Nonlinear Feedback Control of Axisymmetric Aerial Vehicles
+    https://arxiv.org/pdf/1403.5290.pdf
+
+    Kai, J. M., Allibert, G., Hua, M. D., & Hamel, T. (2017). 
+    Nonlinear feedback control of Quadrotors exploiting First-Order Drag Effects. 
+    IFAC-PapersOnLine, 50(1), 8189-8195. https://doi.org/10.1016/j.ifacol.2017.08.1267
+    """
+
+    # Thrust direction is the body Z axis
+    e3 = np.array([[0.0],[0.0],[1.0]])
+
+    # extract real and desired body Z axis
+    zb = np.dot(Rbw,e3)
+    zb_r = np.dot(Rbw_des,e3)
+    zb_r_dot = np.dot(Rbw_ref_dot, e3)
+
+    # Calculation of desired angular velocity is done by 3 terms: an error (or feedback) term,
+    # a feed-forward term and a term for the free degree of freedom of rotation around Z axis (Yaw)
+
+    # Feedback term calculation
+    k10 = 5.0
+    epsilon = 0.01
+    k1 = k10  #k10/(1.0 + np.dot(zb.T, zb_r)[0][0] + epsilon)
+    lambda_dot = 0.0
+    lambda_ = 5.0
+    w_fb = (k1 + lambda_dot/lambda_)*np.cross(zb, zb_r, axis= 0)
+
+    # Feed-forward term calculation
+    w_ff = 0.0*np.cross(zb_r, zb_r_dot, axis = 0)  #np.array([[0.0],[0.0],[0.0]])
+
+    # Yaw rotation
+    w_yaw = 0.0*np.dot(w_ref.T, zb)[0][0] * zb   # np.array([[0.0],[0.0],[0.0]])
+
+    # Convert to body frame
+    w_in = np.dot(Rbw.T,w_fb + w_ff + w_yaw)
+
+    return w_in
