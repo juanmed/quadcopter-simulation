@@ -69,25 +69,25 @@ def record(name):
     # X position
     q_x = map(lambda a: a[0][0], q_s)   # get quad x position
     d_x = map(lambda a: a.pos[0], d_s)  # get desired x position
-    x_e = map(lambda a,b: a-b,d_x,q_x)  # compute error
+    x_e = map(lambda a,b: 10*(a-b),d_x,q_x)  # compute error
 
-    fig0ax2 = utils.add_plots(fig0ax2,t_s,[q_x,d_x,x_e],["-","--","-"],["g","r","b"],["quad -x","des x","x error"],"X - axis position of quadrotor","t {s}","x {m}")
+    fig0ax2 = utils.add_plots(fig0ax2,t_s,[q_x,d_x,x_e],["-","--","-"],["g","r","b"],["quad -x","des x","x error (x10)"],"X - axis position of quadrotor","t {s}","x {m}")
     fig0ax2.legend(loc='lower right', shadow=True, fontsize='small')
 
     # Y position
     q_y = map(lambda a: a[0][1], q_s)
     d_y = map(lambda a: a.pos[1], d_s)
-    y_e = map(lambda a,b: a-b,d_y,q_y)
+    y_e = map(lambda a,b: 10*(a-b),d_y,q_y)
 
-    fig0ax3 = utils.add_plots(fig0ax3,t_s,[q_y,d_y,y_e],["-","--","-"],["g","r","b"],["quad -y","des y","y error"],"Y - axis position of quadrotor","t {s}","y {m}")
+    fig0ax3 = utils.add_plots(fig0ax3,t_s,[q_y,d_y,y_e],["-","--","-"],["g","r","b"],["quad -y","des y","y error (x10)"],"Y - axis position of quadrotor","t {s}","y {m}")
     fig0ax3.legend(loc='lower right', shadow=True, fontsize='small')
 
     # Z position
     q_z = map(lambda a: a[0][2], q_s)
     d_z = map(lambda a: a.pos[2], d_s)
-    z_e = map(lambda a,b: a-b,d_z,q_z)
+    z_e = map(lambda a,b: 10*(a-b),d_z,q_z)
 
-    fig0ax4 = utils.add_plots(fig0ax4,t_s,[q_z,d_z,z_e],["-","--","-"],["g","r","b"],["quad z","des z","z error"],"Z - axis position of quadrotor","t {s}","z {m}")
+    fig0ax4 = utils.add_plots(fig0ax4,t_s,[q_z,d_z,z_e],["-","--","-"],["g","r","b"],["quad z","des z","z error (x10)"],"Z - axis position of quadrotor","t {s}","z {m}")
     fig0ax4.legend(loc='lower right', shadow=True, fontsize='small')
 
     # Euler angles
@@ -101,25 +101,25 @@ def record(name):
     #  X Linear velocity
     q_vx = map(lambda a: a[1][0], q_s)
     d_vx = map(lambda a: a.vel[0], d_s)   
-    vx_e = map(lambda a,b: a-b,d_vx,q_vx)
+    vx_e = map(lambda a,b: 10*(a-b),d_vx,q_vx)
 
-    fig1ax0 = utils.add_plots(fig1ax0,t_s,[q_vx,d_vx,vx_e],["-","--","-"],["g","r","b"],["quad Vx","des Vx","Vx error"],"X axis linear Velocities of quadrotor",'t {s}','Vx {m/s}')
+    fig1ax0 = utils.add_plots(fig1ax0,t_s,[q_vx,d_vx,vx_e],["-","--","-"],["g","r","b"],["quad Vx","des Vx","Vx error (x10)"],"X axis linear Velocities of quadrotor",'t {s}','Vx {m/s}')
     fig1ax0.legend(loc='lower right', shadow=True, fontsize='small')   
 
     #  Y Linear velocity
     q_vy = map(lambda a: a[1][1], q_s)
     d_vy = map(lambda a: a.vel[1], d_s)   
-    vy_e = map(lambda a,b: a-b,d_vy,q_vy)
+    vy_e = map(lambda a,b: 10*(a-b),d_vy,q_vy)
 
-    fig1ax1 = utils.add_plots(fig1ax1,t_s,[q_vy,d_vy,vy_e],["-","--","-"],["g","r","b"],["quad Vy","des Vy","Vy error"],"Y axis linear Velocities of quadrotor",'t {s}','Vy {m/s}')
+    fig1ax1 = utils.add_plots(fig1ax1,t_s,[q_vy,d_vy,vy_e],["-","--","-"],["g","r","b"],["quad Vy","des Vy","Vy error (x10)"],"Y axis linear Velocities of quadrotor",'t {s}','Vy {m/s}')
     fig1ax1.legend(loc='lower right', shadow=True, fontsize='small')  
 
     #  Z Linear velocity
     q_vz = map(lambda a: a[1][2], q_s)
     d_vz = map(lambda a: a.vel[2], d_s)   
-    vz_e = map(lambda a,b: a-b,d_vz,q_vz)
+    vz_e = map(lambda a,b: 10*(a-b),d_vz,q_vz)
 
-    fig1ax2 = utils.add_plots(fig1ax2,t_s,[q_vz,d_vz,vz_e],["-","--","-"],["g","r","b"],["quad Vz","des Vz","Vz error"],"Z axis linear Velocities of quadrotor",'t {s}','Vz {m/s}')
+    fig1ax2 = utils.add_plots(fig1ax2,t_s,[q_vz,d_vz,vz_e],["-","--","-"],["g","r","b"],["quad Vz","des Vz","Vz error (x10)"],"Z axis linear Velocities of quadrotor",'t {s}','Vz {m/s}')
     fig1ax2.legend(loc='lower right', shadow=True, fontsize='small')  
 
     # Angular velocities

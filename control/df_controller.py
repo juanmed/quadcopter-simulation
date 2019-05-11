@@ -95,7 +95,7 @@ def run(quad, des_state):
     # ------------------------ #
     #  Compute thrust
     # ------------------------ #
-    if(mem.loop == 0):   
+    if(True):#(mem.loop == 0):   
         ua_e = -1.0*np.dot(Kp,pos-pos_ref) -1.0*np.dot(Kd,v-v_ref) #-1.0*np.dot(Ki,self.pos_err)  # PID control law
         
         ua_ref = np.array(ref_[5])
@@ -120,7 +120,7 @@ def run(quad, des_state):
         mem.Rbw_des = Rbw_des
 
         mem.loop = mem.loop +1
-        print('*********Ahora***********')
+        #print('*********Ahora***********')
     else:
         mem.loop = mem.loop +1
         if(mem.loop == mem.freq):
