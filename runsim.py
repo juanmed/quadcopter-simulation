@@ -59,7 +59,7 @@ def record(name):
     fig0ax0.legend(loc='lower right', shadow=True, fontsize='small') 
 
     # Torques
-    u2 = map(lambda a: a[0],M_t) # extract u2 for all points in time
+    u2 = map(lambda a: a[0],M_t) # extract ux for all points in time
     u3 = map(lambda a: a[1],M_t)
     u4 = map(lambda a: a[2],M_t)
 
@@ -67,7 +67,7 @@ def record(name):
     fig0ax1.legend(loc='lower right', shadow=True, fontsize='small')
 
     # X position
-    q_x = map(lambda a: a[0][0]*-1.0, q_s)   # get quad x position
+    q_x = map(lambda a: a[0][0], q_s)   # get quad x position
     d_x = map(lambda a: a.pos[0], d_s)  # get desired x position
     x_e = map(lambda a,b: a-b,d_x,q_x)  # compute error
 
@@ -75,7 +75,7 @@ def record(name):
     fig0ax2.legend(loc='lower right', shadow=True, fontsize='small')
 
     # Y position
-    q_y = map(lambda a: a[0][1]*-1.0, q_s)
+    q_y = map(lambda a: a[0][1], q_s)
     d_y = map(lambda a: a.pos[1], d_s)
     y_e = map(lambda a,b: a-b,d_y,q_y)
 
@@ -148,7 +148,8 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     t_s.append(time[0])
     d_s.append(desired_state)
     q_s.append([quad.state[0:3],quad.state[3:6],quad.attitude(),quad.state[10:13]])
-
+    wi = np.dot(params.invB,np.concatenate((np.array([[F]]),M),axis = 0))   # rotor speeds
+    #print(wi)
 
 def main():
     pos = (0.5,0,0)
@@ -165,9 +166,9 @@ def main():
 
     plot_quad_3d(waypoints, control_loop)
 
-    if(False): # save inputs and states graphs
+    if(True): # save inputs and states graphs
         print("Saving figures...")
-        record("df.jpg")
+        record("df_euler.jpg")
     print("Closing.")
 
 if __name__ == "__main__":
