@@ -169,7 +169,7 @@ def main():
 
     if(True): # save inputs and states graphs
         print("Saving figures...")
-        record("df_euler.jpg")
+        record("df.jpg")
     print("Closing.")
 
 if __name__ == "__main__":

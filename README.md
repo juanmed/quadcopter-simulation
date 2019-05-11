@@ -3,7 +3,19 @@ Quadcopter 3D Simulator
 
 The project simulates a quadcopter in 3D environment. It contains a basic quadcopter dynamics model, hover controller, trajectory generator, visualisation toolkit and a top level scheduler which runs each module at a specific rate.
 
-![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/sim.gif)
+#### PID Controller
+
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/pid.gif)
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_pid.gif)
+
+#### LQR Controller
+
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/lqr.gif)
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_lqr.gif)
+
+#### Differential Flatness based controller (euler angle orientation representation)
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/df.gif)
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_df.gif)
 
 Motivation
 -----

@@ -139,7 +139,7 @@ def run(quad, des_state):
     #M = kai_control_torque(w, w_des, w_dot_ref, 0.17)           # gain = 0.17 from kai, allibert, hamel paper
     M = feedback_linearization_torque(w, w_des, ref_[6], Kr)
 
-    print("F: {}\n M: {}".format(mem.F.item(0),M.flatten()))
+    #print("F: {}\n M: {}".format(mem.F.item(0),M.flatten()))
     return mem.F.item(0), M
 
 def pucci_angular_velocity_des(Rbw, Rbw_des, Rbw_ref_dot, w_ref):
