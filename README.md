@@ -6,16 +6,16 @@ The project simulates a quadcopter in 3D environment. It contains a basic quadco
 #### PID Controller
 
 ![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/pid.gif)
-![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_pid.gif)
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_pid.jpg)
 
 #### LQR Controller
 
 ![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/lqr.gif)
-![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_lqr.gif)
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_lqr.jpg)
 
 #### Differential Flatness based controller (euler angle orientation representation)
 ![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/df.gif)
-![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_df.gif)
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_df.jpg)
 
 Motivation
 -----
