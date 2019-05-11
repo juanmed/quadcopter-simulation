@@ -57,6 +57,7 @@
 
 
 import control as ctl
+print(ctl)
 import numpy as np 
 
 # In general    u = Nu*r - K(x -Nx*r) = -K*x + (Nu + K*Nx)*r

@@ -59,7 +59,7 @@ def record(name):
     fig0ax0.legend(loc='lower right', shadow=True, fontsize='small') 
 
     # Torques
-    u2 = map(lambda a: a[0],M_t) # extract u2 for all points in time
+    u2 = map(lambda a: a[0],M_t) # extract ux for all points in time
     u3 = map(lambda a: a[1],M_t)
     u4 = map(lambda a: a[2],M_t)
 
@@ -139,7 +139,7 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     #print(time[0])
     desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints, coeff_x, coeff_y, coeff_z)
     #desired_state = trajGen3D.generate_helix_trajectory(time[0], sim_time)  
-    F, M = pid.run(quad, desired_state)
+    F, M = df.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
 
@@ -149,7 +149,8 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     t_s.append(time[0])
     d_s.append(desired_state)
     q_s.append([quad.state[0:3],quad.state[3:6],quad.attitude(),quad.state[10:13]])
-
+    wi = np.dot(params.invB,np.concatenate((np.array([[F]]),M),axis = 0))   # rotor speeds
+    #print(wi)
 
 def main():
     pos = (0.5,0,0) 
@@ -166,10 +167,10 @@ def main():
 
     plot_quad_3d(waypoints, control_loop)
 
-    if(False): # save inputs and states graphs
+    if(True): # save inputs and states graphs
         print("Saving figures...")
-        record("lqr.jpg")
-    print(">> Closing.")
+        record("df_euler.jpg")
+    print("Closing.")
 
 if __name__ == "__main__":
     main()

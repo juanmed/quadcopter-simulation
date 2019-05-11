@@ -20,8 +20,8 @@ minF = 0.0
 maxF = 2.0 * mass * g
 L = arm_length
 H = height
-km = 1.5e-9
-kf = 6.11e-8
+km = 1.5e-9   # torque constant
+kf = 6.11e-8  # thrust constant
 r = km / kf
 
 #  [ F  ]         [ F1 ]
@@ -33,7 +33,13 @@ A = np.array([[ 1,  1,  1,  1],
               [-L,  0,  L,  0],
               [ r, -r,  r, -r]])
 
+B = np.array([[kf, kf, kf, kf],
+              [0, L*kf, 0, -L*kf],
+              [-L*kf, 0, L*kf, 0],
+              [-km, km, -km, km]])
+
 invA = np.linalg.inv(A)
+invB = np.linalg.inv(B)
 
 body_frame = np.array([(L, 0, 0, 1),
                        (0, L, 0, 1),
