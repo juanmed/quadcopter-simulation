@@ -33,6 +33,7 @@ M_t = list()  # Torque
 t_s = list()  # simulation time
 d_s = list()  # desired states
 q_s = list()  # quadrotor states
+w_i = list()  # rotor speeds
 
 
 def record(name):
@@ -130,6 +131,14 @@ def record(name):
     fig1ax3 = utils.add_plots(fig1ax3,t_s,[q_wx,q_wy,q_wz],["-","-","-"],["r","g","b"],["wx","wy","wz"],"Angular velocities of quadrotor",'t {s}','wx, wy, wz {degree/s}')
     fig1ax3.legend(loc='lower right', shadow=True, fontsize='small')
 
+    # rotor speeds
+    w_0 = map(lambda a: np.sqrt(a[0][0]) if a[0][0] > 0 else -np.sqrt(-a[0][0]),w_i)
+    w_1 = map(lambda a: np.sqrt(a[1][0]) if a[1][0] > 0 else -np.sqrt(-a[1][0]),w_i)
+    w_2 = map(lambda a: np.sqrt(a[2][0]) if a[2][0] > 0 else -np.sqrt(-a[2][0]),w_i)
+    w_3 = map(lambda a: np.sqrt(a[3][0]) if a[3][0] > 0 else -np.sqrt(-a[3][0]),w_i)
+
+    fig1ax4 = utils.add_plots(fig1ax4, t_s, [w_0,w_1,w_2,w_3],["-","-","-","-"],["r","g","b","c"],["w0","w1","w2","w3"],"Rotor Speeds",'t {s}','{rpm}')
+    fig1ax4.legend(loc='lower right', shadow=True, fontsize='small')
     # save
     fig0.savefig("t_"+name, dpi = 300) #translation variables
     fig1.savefig("r_"+name, dpi = 300) #rotation variables
@@ -139,7 +148,7 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     #print(time[0])
     desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints, coeff_x, coeff_y, coeff_z)
     #desired_state = trajGen3D.generate_helix_trajectory(time[0], sim_time)  
-    F, M = df.run(quad, desired_state)
+    F, M = lqr.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
 
@@ -149,8 +158,7 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     t_s.append(time[0])
     d_s.append(desired_state)
     q_s.append([quad.state[0:3],quad.state[3:6],quad.attitude(),quad.state[10:13]])
-    wi = np.dot(params.invB,np.concatenate((np.array([[F]]),M),axis = 0))   # rotor speeds
-    #print(wi)
+    w_i.append(np.dot(params.invB,np.concatenate((np.array([[F]]),M),axis = 0)))   # rotor speeds
 
 def main():
     pos = (0.5,0,0) 
@@ -169,7 +177,7 @@ def main():
 
     if(True): # save inputs and states graphs
         print("Saving figures...")
-        record("df.jpg")
+        record("lqr.jpg")
     print("Closing.")
 
 if __name__ == "__main__":
