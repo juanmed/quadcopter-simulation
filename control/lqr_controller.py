@@ -5,6 +5,8 @@ import numpy as np
 import model.params as params
 from math import sin, cos
 
+import utils.utils as utils
+
 # Z dynamics LQR Gains and input matrices
 K_z = np.matrix([10.0, 2.04709])
 Nu_z = np.matrix([0.0])
@@ -59,7 +61,7 @@ def run(quad, des_state):
     state = np.matrix([[z],[z_dot]])
     # Calculating thrust, note it is identical to above equation for u
     F = -K_z*state +(Nu_z + K_z*Nx_z)*des_z
-    F = saturate_scalar_minmax(F.item(0), 12., 0.)
+    F = utils.saturate_scalar_minmax(F.item(0), 12., 0.)
 
     # For X  dynamics, the only coupled variables are the x, x_dot, theta and q
     # so make an state vector for this dynamics
@@ -87,25 +89,3 @@ def run(quad, des_state):
 
     return F, M
 
-def saturate_scalar_minmax(value, max_value, min_value):
-    """
-    @ description saturation function for a scalar with definded maximum and minimum value
-    See Q. Quan. Introduction to Multicopter Design (2017), Ch11.3, page 265 for reference
-    """
-    mean = (max_value + min_value)/2.0
-    half_range = (max_value - min_value)/2.0
-    return saturate_vector_dg(value-mean, half_range) + mean
-
-
-# saturation function for vectors
-def saturate_vector_dg(v, max_value):
-    """
-    @description saturation function for the magnitude of a vector with maximum magnitude 
-    and guaranteed direction.
-    See Q. Quan. Introduction to Multicopter Design (2017), Ch. 10.2 for reference
-    """
-    mag = np.linalg.norm(v)
-    if( mag < max_value):
-        return v
-    else:
-        return np.dot(v/mag,max_value)  # return vector in same direction but maximum possible magnitude
