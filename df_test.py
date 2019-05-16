@@ -91,7 +91,7 @@ def draw_output(states, figs):
     wy1_dot = map(lambda a: a[4][1][0], states)
     wz1_dot = map(lambda a: a[4][2][0], states)
     #print(wx1)
-    figs[2] = utils.add_plots(figs[2],sim_time,[wx1_dot,wy1_dot,wz1_dot],["-","-","-"],["r","g","b"],["wx_dot","wy_dot","wz_dot"],"Angular acceleration of quadrotor",'t {s}','wx, wy, wz {degree/s}')
+    figs[2] = utils.add_plots(figs[2],sim_time,[wx1_dot,wy1_dot,wz1_dot],["-","-","-"],["r","g","b"],["wx_dot","wy_dot","wz_dot"],"Angular acceleration of quadrotor",'t {s}','wx, wy, wz {degree/s2}')
     figs[2].legend(loc='lower right', shadow=True, fontsize='small')    
 
     # control torque
@@ -99,7 +99,7 @@ def draw_output(states, figs):
     uy1 = map(lambda a: a[9][1][0], states)
     uz1 = map(lambda a: a[9][2][0], states)
     #print(wx1)
-    figs[3] = utils.add_plots(figs[3],sim_time,[ux1,uy1,uz1],["-","-","-"],["r","g","b"],["ux","uy","uz"],"Angular acceleration of quadrotor",'t {s}','wx, wy, wz {degree/s}')
+    figs[3] = utils.add_plots(figs[3],sim_time,[ux1,uy1,uz1],["-","-","-"],["r","g","b"],["ux","uy","uz"],"Control Torque",'t {s}','ux, uy, uz {Nm}')
     figs[3].legend(loc='lower right', shadow=True, fontsize='small')    
 
     # control thrust
@@ -107,6 +107,14 @@ def draw_output(states, figs):
     weight = params.mass*params.g*np.ones_like(F_t)
     figs[4] = utils.add_plots(figs[4],sim_time,[F_t,weight],["-","--"],["r","k"],["F","m*g"],"Rotor Thrust -F- over time",'t {s}','F {N}')
     figs[4].legend(loc='lower right', shadow=True, fontsize='small') 
+
+    # Euler rates
+    phi1_dot = map(lambda a: a[7][0][0]*180.0/np.pi, states)
+    theta1_dot = map(lambda a: a[7][1][0]*180.0/np.pi, states)
+    psi1_dot = map(lambda a: a[7][2][0]*180.0/np.pi, states)
+
+    figs[5] = utils.add_plots(figs[5],sim_time,[phi1_dot,theta1_dot,psi1_dot],["-","-","-"],["r","g","b"],["phi_dot","theta_dot","psi_dot"],"Euler Rates",'t {s}','phi, theta, psi {degree/s}')
+    figs[5].legend(loc='lower right', shadow=True, fontsize='small')  
 
 
 if __name__ == '__main__':
