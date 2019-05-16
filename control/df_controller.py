@@ -67,7 +67,7 @@ def run(quad, des_state):
 
     # extract each reference state and inputs
     pos_ref = np.array(ref_[0])
-    print(pos_ref,type(pos_ref), pos_ref.shape)
+    #print(pos_ref,type(pos_ref), pos_ref.shape)
     v_ref = np.array(ref_[1])
     or_ref = np.array(ref_[2])
     w_ref = np.array(ref_[3])

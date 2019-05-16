@@ -48,19 +48,15 @@ def get_z(sigma3):
 def get_psi(sigma4):
     return sigma4
 
-def get_u1(t):
-    u1 = m*np.linalg.norm(t)
-    return u1
-
 def get_zb(acc, z_w, vel):
     """
     The body-axis Z vector is in the direction of the thrust vector
     but with magnitude = 1
     """
     inertial_vector = params.mass*acc
-    gravity_vector = params.g*z_w
+    weight_vector = params.mass*params.g*z_w
     drag_vector = params.gamma*vel
-    thrust_vector = inertial_vector + gravity_vector + drag_vector
+    thrust_vector = inertial_vector + weight_vector + drag_vector
     return thrust_vector/np.linalg.norm(thrust_vector)
 
 def get_real_thrust(z_b, acc, z_w, vel):
@@ -68,9 +64,9 @@ def get_real_thrust(z_b, acc, z_w, vel):
     Calculate real thrust magnitude
     """
     inertial_vector = params.mass*acc
-    gravity_vector = params.g*z_w
+    weight_vector = params.mass*params.g*z_w
     drag_vector = params.gamma*vel   
-    real_thrust = np.dot(z_b.T, inertial_vector + gravity_vector + drag_vector) 
+    real_thrust = np.dot(z_b.T, inertial_vector + weight_vector + drag_vector) 
     return real_thrust[0][0] # return scalar only
 
 def get_real_thrust_dot(z_b, jerk, acc):
@@ -104,8 +100,6 @@ def get_yb(z_b,x_b):
 
 def get_wx(y_b,jerk,T_real, acc):
     """ Return body x axis angular velocity"""
-    print("a {}".format(acc))
-    print("y_b.T {}".format(y_b.T))
     a = -1.0*params.mass*np.dot(y_b.T,jerk)
     b = -1.0*params.gamma*np.dot(y_b.T, acc)
     w_x = (a+b)/T_real
