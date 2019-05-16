@@ -65,15 +65,46 @@ class Quadcopter:
     def omega(self):
         return self.state[10:13]
 
-    def state_dot(self, state, t, F, M):
+    def rotor_drag(self, v, vw, w, Fi, wRb, di):
+        """
+        Compute drag force for a single rotor with thrust Fi
+        """
+        va = v - vw # relative air velocity w.r.t. center of gravity
+        Va_i = np.dot(wRb.T,va) + np.cross(w,di, axis = 0) # relative air velocity w.r.t each rotor
+        Fa_i = -1.0*np.sqrt(Fi)*params.cd1*np.dot(params.pi_e3,Va_i)
+        return Fa_i
+
+    def total_rotor_drag(self, v, vw, w, Fi_s, wRb):
+        """
+        Compute sum of drag force from all rotors
+        """
+        rotor_arm_vectors = [params.r1, params.r2, params.r3, params.r4]
+        rotor_thrusts = [Fi_s[0][0], Fi_s[1][0], Fi_s[2][0], Fi_s[3][0]]
+        Fa = 0
+        for arm, thrust in zip(rotor_arm_vectors, rotor_thrusts):
+            Fa = Fa + self.rotor_drag(v, vw, w, thrust, wRb, arm)
+
+        return Fa
+
+
+
+    def state_dot(self, state, t, F, M, Fi_s):
         x, y, z, xdot, ydot, zdot, qw, qx, qy, qz, p, q, r = state
         quat = np.array([qw,qx,qy,qz])
 
         bRw = Quaternion(quat).as_rotation_matrix() # world to body rotation matrix
         wRb = bRw.T # orthogonal matrix inverse = transpose
+
         # acceleration - Newton's second law of motion
-        accel = 1.0 / params.mass * (wRb.dot(np.array([[0, 0, F]]).T)
-                    - np.array([[0, 0, params.mass * params.g]]).T)
+        #accel = (1.0 / params.mass) * (wRb.dot(np.array([[0, 0, F]]).T) - np.array([[0, 0, params.mass * params.g]]).T)
+                    
+
+        v = np.array([[xdot],[ydot],[zdot]])
+        vw = np.array([[0],[0],[0]])                # wind velocity
+        omega = np.array([[p],[q],[r]])
+        Fa =  self.total_rotor_drag(v, vw, omega, Fi_s, wRb)   # total rotor drag in body frame
+        accel = -params.g*params.e3 + (F/params.mass)*np.dot(wRb,params.e3) + np.dot(wRb, Fa)
+
         # angular velocity - using quternion
         # http://www.euclideanspace.com/physics/kinematics/angularvelocity/
         K_quat = 2.0; # this enforces the magnitude 1 constraint for the quaternion
@@ -91,9 +122,9 @@ class Quadcopter:
         state_dot[0]  = xdot
         state_dot[1]  = ydot
         state_dot[2]  = zdot
-        state_dot[3]  = accel[0]
-        state_dot[4]  = accel[1]
-        state_dot[5]  = accel[2]
+        state_dot[3]  = accel[0][0]
+        state_dot[4]  = accel[1][0]
+        state_dot[5]  = accel[2][0]
         state_dot[6]  = qdot[0]
         state_dot[7]  = qdot[1]
         state_dot[8]  = qdot[2]
@@ -109,7 +140,7 @@ class Quadcopter:
         L = params.arm_length
         r = params.r
         prop_thrusts = params.invA.dot(np.r_[np.array([[F]]), M])
-        prop_thrusts_clamped = np.maximum(np.minimum(prop_thrusts, params.maxF/4.0), params.minF/4.0)
+        prop_thrusts_clamped = np.maximum(np.minimum(prop_thrusts, params.maxF/params.number_of_rotors), params.minF/params.number_of_rotors)
         F = np.sum(prop_thrusts_clamped)
         M = params.A[1:].dot(prop_thrusts_clamped)
-        self.state = integrate.odeint(self.state_dot, self.state, [0,dt], args = (F, M))[1]
+        self.state = integrate.odeint(self.state_dot, self.state, [0,dt], args = (F, M, prop_thrusts_clamped))[1]

@@ -10,6 +10,7 @@ import model.params as params
 from math import sin, cos
 
 import dif_flat_rotor_drag as dfl
+#import dif_flat as dfl
 import gains
 from utils.utils import RPYToRot_ZYX
 

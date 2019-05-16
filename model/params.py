@@ -16,13 +16,18 @@ I = np.array([(0.00025, 0, 2.55e-6),
 invI = np.linalg.inv(I)
 arm_length = 0.086 # meter
 height = 0.05
-minF = 0.0
-maxF = 2.0 * mass * g
+
 L = arm_length
 H = height
 km = 1.5e-9   # torque constant
 kf = 6.11e-8  # thrust constant
 r = km / kf
+
+number_of_rotors = 4.0
+max_rotor_speed = 4000  #rpm
+minF = 0.0
+maxF = number_of_rotors*kf*(max_rotor_speed)**2 
+#maxF = 2.0 * mass * g
 
 #  [ F  ]         [ F1 ]
 #  | M1 |  = A *  | F2 |
@@ -57,6 +62,14 @@ e3 = np.array([[0.0],[0.0],[1.0]])
 # rotor drag parameters (rigid propellers)
 cd1 = 0.055 # see [1]
 gamma = 2*np.sqrt(mass*g)*cd1
+pi_e3 = np.diag([1.0,1.0,1.0]) - np.dot(e3,e3.T)
+
+
+# rotor arm vectors
+r1 = np.array([[L],[0.0],[H]])
+r2 = np.array([[0.0],[L],[H]])
+r3 = np.array([[-L],[0.0],[H]])
+r4 = np.array([[0.0],[L],[H]])
 
 # References:
 #[1] Kai, J. M., Allibert, G., Hua, M. D., & Hamel, T. (2017). 
