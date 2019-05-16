@@ -60,10 +60,10 @@ e3 = np.array([[0.0],[0.0],[1.0]])
 
 
 # rotor drag parameters (rigid propellers)
-cd1 = 0.055 # see [1]
+cd1 = 0.1 #0.055 # see [1]
 gamma = 2*np.sqrt(mass*g)*cd1
 pi_e3 = np.diag([1.0,1.0,1.0]) - np.dot(e3,e3.T)
-
+D = gamma*pi_e3
 
 # rotor arm vectors
 r1 = np.array([[L],[0.0],[H]])

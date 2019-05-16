@@ -9,7 +9,8 @@ from quadPlot import plot_quad_3d
 
 from control import lqr_controller as lqr
 from control import pid_controller as pid
-from control import df_controller as df
+from control import df_controller as df1
+from control import df_controller_rotor_drag as df2
 
 import trajGen
 import trajGen3D
@@ -148,7 +149,7 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     #print(time[0])
     desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints, coeff_x, coeff_y, coeff_z)
     #desired_state = trajGen3D.generate_helix_trajectory(time[0], sim_time)  
-    F, M = pid.run(quad, desired_state)
+    F, M = df2.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
 
@@ -173,9 +174,9 @@ def main():
 
     plot_quad_3d(waypoints, control_loop)
 
-    if(True): # save inputs and states graphs
+    if(False): # save inputs and states graphs
         print("Saving figures...")
-        record("pid_airdrag.jpg")
+        record("df3.jpg")
     print("Closing.")
 
 if __name__ == "__main__":

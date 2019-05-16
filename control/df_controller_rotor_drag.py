@@ -9,7 +9,7 @@ import numpy as np
 import model.params as params
 from math import sin, cos
 
-import dif_flat as dfl
+import dif_flat_rotor_drag as dfl
 import gains
 from utils.utils import RPYToRot_ZYX
 
@@ -97,7 +97,10 @@ def run(quad, des_state):
         
         ua_ref = np.array(ref_[5])
 
-        ua = ua_e + ua_ref
+        v_ref_b = np.dot(Rbw_ref.T, v_ref)  # ref linear velocity expressed in body frame
+        Fa_b_ref = np.dot(params.D, v_ref_b)  #   ref rotor drag expressed in body frame
+        Fa =  np.dot(Rbw_ref,Fa_b_ref)      # ref rotor drag expressed in world frame
+        ua = ua_e + ua_ref + Fa
 
         e_3 = np.array([[0.0],[0.0],[1.0]])  # this is z axis of body expressed in body frame
         Z_w = np.array([[0.0],[0.0],[1.0]])  # the Z axis of world frame expressed in body frame is equal to Z_b...

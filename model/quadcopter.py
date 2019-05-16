@@ -71,7 +71,7 @@ class Quadcopter:
         """
         va = v - vw # relative air velocity w.r.t. center of gravity
         Va_i = np.dot(wRb.T,va) + np.cross(w,di, axis = 0) # relative air velocity w.r.t each rotor
-        Fa_i = -1.0*np.sqrt(Fi)*params.cd1*np.dot(params.pi_e3,Va_i)
+        Fa_i = -1.0*np.sqrt(Fi)*np.dot(params.D,Va_i)
         return Fa_i
 
     def total_rotor_drag(self, v, vw, w, Fi_s, wRb):
