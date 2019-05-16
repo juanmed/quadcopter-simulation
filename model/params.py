@@ -47,3 +47,19 @@ body_frame = np.array([(L, 0, 0, 1),
                        (0, -L, 0, 1),
                        (0, 0, 0, 1),
                        (0, 0, H, 1)])
+
+# R3 basis vectors
+e1 = np.array([[1.0],[0.0],[0.0]])
+e2 = np.array([[0.0],[1.0],[0.0]])
+e3 = np.array([[0.0],[0.0],[1.0]])
+
+
+# rotor drag parameters (rigid propellers)
+cd1 = 0.055 # see [1]
+gamma = 2*np.sqrt(mass*g)*cd1
+
+# References:
+#[1] Kai, J. M., Allibert, G., Hua, M. D., & Hamel, T. (2017). 
+# Nonlinear feedback control of Quadrotors exploiting First-Order Drag Effects. 
+# IFAC-PapersOnLine, 50(1), 8189-8195. 
+# https://doi.org/10.1016/j.ifacol.2017.08.1267
