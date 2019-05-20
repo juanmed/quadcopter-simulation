@@ -176,10 +176,10 @@ def get_ua(T_command,z_b, Rbw, vel):
     normalized_gravity = -1.0*params.g*params.e3 
     normalized_command_thrust = T_command*z_b/params.mass
     
-    pi_e3 = np.diag([1.0,1.0,1.0]) - np.dot(params.e3, params.e3.T)
-    D = params.gamma*pi_e3
+    #pi_e3 = np.diag([1.0,1.0,1.0]) - np.dot(params.e3, params.e3.T)
+    #D = params.gamma*pi_e3
     bodyframe_v = np.dot(Rbw.T,vel)
-    bodyframe_drag = np.dot(D,bodyframe_v)
+    bodyframe_drag = np.dot(params.D,bodyframe_v)
     worldframe_drag = np.dot(Rbw, bodyframe_drag)
     normalized_worldframe_drag = -1.0*worldframe_drag/params.mass
     u_a = normalized_gravity + normalized_command_thrust + normalized_worldframe_drag

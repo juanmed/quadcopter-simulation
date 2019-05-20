@@ -26,7 +26,7 @@ def plot_quad_3d(waypoints, get_world_frame):
     ax.plot([], [], [], '-', c='blue', marker='o', markevery=2)[0]
     ax.plot([], [], [], '.', c='red', markersize=4)[0]
     ax.plot([], [], [], '.', c='blue', markersize=2)[0]
-    set_limit((-0.5,0.5), (-0.5,0.5), (-0.5,8))
+    set_limit((-0.5,0.5), (-0.5,0.5), (0,8))
     plot_waypoints(waypoints)
     an = animation.FuncAnimation(fig,
                                  anim_callback,
@@ -36,7 +36,7 @@ def plot_quad_3d(waypoints, get_world_frame):
 
     if len(sys.argv) > 1 and sys.argv[1] == 'save':
         print ">> Saving gif"
-        an.save('pid_airdrag.gif', dpi=80, writer='imagemagick', fps=60)
+        an.save('df3_airdrag.gif', dpi=80, writer='imagemagick', fps=60)
     else:
         plt.show()
 

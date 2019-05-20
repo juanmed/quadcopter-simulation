@@ -100,7 +100,7 @@ def run(quad, des_state):
         v_ref_b = np.dot(Rbw_ref.T, v_ref)  # ref linear velocity expressed in body frame
         Fa_b_ref = np.dot(params.D, v_ref_b)  #   ref rotor drag expressed in body frame
         Fa =  np.dot(Rbw_ref,Fa_b_ref)      # ref rotor drag expressed in world frame
-        ua = ua_e + ua_ref + Fa
+        ua = ua_e + ua_ref #+ Fa
 
         e_3 = np.array([[0.0],[0.0],[1.0]])  # this is z axis of body expressed in body frame
         Z_w = np.array([[0.0],[0.0],[1.0]])  # the Z axis of world frame expressed in body frame is equal to Z_b...

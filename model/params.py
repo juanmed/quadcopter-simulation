@@ -24,10 +24,10 @@ kf = 6.11e-8  # thrust constant
 r = km / kf
 
 number_of_rotors = 4.0
-max_rotor_speed = 4000  #rpm
+max_rotor_speed = 6000  #rpm
 minF = 0.0
-maxF = number_of_rotors*kf*(max_rotor_speed)**2 
-#maxF = 2.0 * mass * g
+#maxF = number_of_rotors*kf*(max_rotor_speed)**2 
+maxF = 2.0 * mass * g
 
 #  [ F  ]         [ F1 ]
 #  | M1 |  = A *  | F2 |
@@ -60,7 +60,7 @@ e3 = np.array([[0.0],[0.0],[1.0]])
 
 
 # rotor drag parameters (rigid propellers)
-cd1 = 0.1 #0.055 # see [1]
+cd1 = 0.055 # see [1]
 gamma = 2*np.sqrt(mass*g)*cd1
 pi_e3 = np.diag([1.0,1.0,1.0]) - np.dot(e3,e3.T)
 D = gamma*pi_e3
@@ -70,6 +70,10 @@ r1 = np.array([[L],[0.0],[H]])
 r2 = np.array([[0.0],[L],[H]])
 r3 = np.array([[-L],[0.0],[H]])
 r4 = np.array([[0.0],[L],[H]])
+
+# params for thurst linearization
+K = 0.23
+b = 1.01
 
 # References:
 #[1] Kai, J. M., Allibert, G., Hua, M. D., & Hamel, T. (2017). 

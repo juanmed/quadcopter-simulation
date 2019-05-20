@@ -11,6 +11,8 @@ from control import lqr_controller as lqr
 from control import pid_controller as pid
 from control import df_controller as df1
 from control import df_controller_rotor_drag as df2
+from control import df_controller_rotor_drag_VT as df3
+
 
 import trajGen
 import trajGen3D
@@ -36,6 +38,7 @@ d_s = list()  # desired states
 q_s = list()  # quadrotor states
 w_i = list()  # rotor speeds
 
+# Test: sim_time = 2pi, v = 1.5, helix
 
 def record(name):
     fig0 = plt.figure(figsize=(20,10))
@@ -149,7 +152,7 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
     #print(time[0])
     desired_state = trajGen3D.generate_trajectory(time[0], 1.2, waypoints, coeff_x, coeff_y, coeff_z)
     #desired_state = trajGen3D.generate_helix_trajectory(time[0], sim_time)  
-    F, M = df2.run(quad, desired_state)
+    F, M = df3.run(quad, desired_state)
     quad.update(dt, F, M)
     time[0] += dt
 
@@ -164,7 +167,7 @@ def attitudeControl(quad, time, waypoints, coeff_x, coeff_y, coeff_z):
 def main():
     pos = (0.5,0,0) 
     attitude = (0,0,0)
-    quadcopter = Quadcopter(pos, attitude)
+    quadcopter = Quadcopter(pos, attitude)  
     waypoints = trajGen3D.get_helix_waypoints(sim_time, 9)
     (coeff_x, coeff_y, coeff_z) = trajGen3D.get_MST_coefficients(waypoints)
     def control_loop(i):
@@ -174,9 +177,9 @@ def main():
 
     plot_quad_3d(waypoints, control_loop)
 
-    if(False): # save inputs and states graphs
+    if(True): # save inputs and states graphs
         print("Saving figures...")
-        record("df3.jpg")
+        record("df3_airdrag.jpg")
     print("Closing.")
 
 if __name__ == "__main__":

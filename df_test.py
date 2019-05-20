@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 
 import control.dif_flat as df_flat 
 import control.dif_flat_rotor_drag as df_flat_drag
+import control.dif_flat_VT_rotordrag as df_flat_VT
 import utils.utils as utils
 import model.params as params
 
@@ -125,11 +126,13 @@ if __name__ == '__main__':
     
     ref_states1 = list()
     ref_states2 = list()
-    
+    ref_states3 = list()
+
     for t in sim_time:
         flat_out_traj = gen_helix_trajectory2(t)
         ref_states1.append(df_flat.compute_ref(flat_out_traj))
         ref_states2.append(df_flat_drag.compute_ref(flat_out_traj))
+        ref_states3.append(df_flat_VT.compute_ref(flat_out_traj))
 
     # convert to np.array
     ref_states1 = map(lambda a: map(lambda b: np.array(b),a), ref_states1)
@@ -155,10 +158,24 @@ if __name__ == '__main__':
     fig1ax5 = fig1.add_subplot(3,2,6)
     fig1.suptitle("Differential Flatness with Drag") 
 
+    fig2 = plt.figure(figsize=(20,10))
+    fig2.tight_layout()
+    fig2ax0 = fig2.add_subplot(3,2,1)
+    fig2ax1 = fig2.add_subplot(3,2,2)
+    fig2ax2 = fig2.add_subplot(3,2,3)
+    fig2ax3 = fig2.add_subplot(3,2,4)
+    fig2ax4 = fig2.add_subplot(3,2,5)
+    fig2ax5 = fig2.add_subplot(3,2,6)
+    fig2.suptitle("Differential Flatness with Thrust/Velocity dependent rotor drag")     
+
     figlist0 = [fig0ax0, fig0ax1, fig0ax2, fig0ax3, fig0ax4, fig0ax5]
     draw_output(ref_states1, figlist0)
     figlist1 = [fig1ax0, fig1ax1, fig1ax2, fig1ax3, fig1ax4, fig1ax5]
     draw_output(ref_states2, figlist1)
+    figlist2 = [fig2ax0, fig2ax1, fig2ax2, fig2ax3, fig2ax4, fig2ax5]
+    draw_output(ref_states3, figlist2)
+
+
 
 
 

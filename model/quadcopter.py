@@ -98,12 +98,15 @@ class Quadcopter:
         # acceleration - Newton's second law of motion
         #accel = (1.0 / params.mass) * (wRb.dot(np.array([[0, 0, F]]).T) - np.array([[0, 0, params.mass * params.g]]).T)
                     
-
-        v = np.array([[xdot],[ydot],[zdot]])
-        vw = np.array([[0],[0],[0]])                # wind velocity
-        omega = np.array([[p],[q],[r]])
-        Fa =  self.total_rotor_drag(v, vw, omega, Fi_s, wRb)   # total rotor drag in body frame
-        accel = -params.g*params.e3 + (F/params.mass)*np.dot(wRb,params.e3) + np.dot(wRb, Fa)
+        rotor_drag = True
+        if(rotor_drag):
+            v = np.array([[xdot],[ydot],[zdot]])
+            vw = np.array([[0],[0],[0]])                # wind velocity
+            omega = np.array([[p],[q],[r]])
+            Fa =  self.total_rotor_drag(v, vw, omega, Fi_s, wRb)   # total rotor drag in body frame
+        else:
+            Fa = np.array([[0],[0],[0]])
+        accel = -params.g*params.e3 + (F/params.mass)*np.dot(wRb,params.e3) + np.dot(wRb, Fa) 
 
         # angular velocity - using quternion
         # http://www.euclideanspace.com/physics/kinematics/angularvelocity/
