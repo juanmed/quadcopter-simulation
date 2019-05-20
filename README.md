@@ -34,8 +34,8 @@ Rotor drag is modeled as in reference [1] for rigid propellers. Adding this impo
 
 #### Differential Flatness based controller with velocity-and-thrust dependent rotor drag
 
-![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/df2_airdrag.gif)
-![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_df2_airdrag.jpg)
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/df3_airdrag.gif)
+![alt tag](https://github.com/juanmed/quadcopter-simulation/blob/master/t_df3_airdrag.jpg)
 
 Motivation
 -----
